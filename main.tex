@@ -1,4 +1,5 @@
-\documentclass{paper}
+\documentclass[a4paper, UKenglish]{lipics-v2018}
+
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -13,13 +14,14 @@
 \usepackage{wrapfig}
 \usepackage{float}
 \usepackage{booktabs}
-\usepackage[margin=0.7in,footskip=0.25in]{geometry}
-\newtheorem{definition}{Definition}
+%\usepackage[margin=0.7in,footskip=0.25in]{geometry}
+
+%\newtheorem{definition}{Definition}
 \newtheorem{condition}{Condition}
 \newtheorem{conjecture}{Conjecture}
 \newtheorem{observation}{Observation}
-\newtheorem{lemma}{Lemma}
-\newtheorem{theorem}{Theorem}
+%\newtheorem{lemma}{Lemma}
+%\newtheorem{theorem}{Theorem}
 
 \newcommand{\mremark}[3]{\textcolor{blue}{\textsc{#1 #2:}} \textcolor{SeaGreen}{\textsf{#3}}}
 
@@ -36,7 +38,7 @@
 
 \newcommand{\spg}{\mathcal{S\!P}}
 \newcommand{\ixi}{\mathcal{I}}
-\newcommand{\pix}{\resizebox{2mm}{2mm}{\square}}
+\newcommand{\pix}{\square}
 \newcommand{\spix}{\boxplus}
 
 \newcommand{\eps}{\varepsilon}
@@ -117,10 +119,12 @@ Three polygons without restrictions &  \multicolumn{2}{c}{unbounded}\\
 
 
 \section{Preliminaries}
+\label {sec:prelims}
 
 \paragraph {Simple grid polygons.}
 
-Let $\Xi$ be the (infinite) unit grid, which we interpret as a set of {\em pixels} (unit squares): an element $\pix \in \Xi$ is a subset of $\R^2$ of the form $[a,a+1]\times[b,b+1]$ for integers $a$ and $b$.
+Let $\Xi$ be the (infinite) unit grid, which we interpret as a set of {\em pixels} (unit squares): 
+an element $\pix \in \Xi$ is a subset of $\R^2$ of the form $[a,a+1]\times[b,b+1]$ for integers $a$ and $b$.
 For a given set of pixels $X \subset \Xi$, we denote the region $\cup_{\pix \in X}\pix$ covered by $X$ simply by $\cup(X)$, and we write $\partial(X)$ for the boundary of $\cup(X)$.
 
 \begin{definition}
@@ -140,7 +144,7 @@ For $v\in \Xi$, let $N(v)$ be the four neighbors of v. Further for $W\subseteq \
 
 The {\em Hausdorff distance}~\cite{} between two sets $A, B \subset \R^2$ is defined as 
 \[
-  H(A, B) = \max \{\max_{a \in A}(\min_{b \in B}(|ab|)), \max_{b \in B}(\min_{a \in A}(|ab|))\}$
+  H(A, B) = \max \{\max_{a \in A}(\min_{b \in B}(|ab|)), \max_{b \in B}(\min_{a \in A}(|ab|))\}
 \]
 
 Note that the Hausdorff distance between any two closed sets is equal to the Hausdorff distance between the boundaries of those sets.
@@ -163,7 +167,7 @@ We further require that the grid polygons are sufficiently spaced; that is, $\pa
 We may interpret a solution as a {\em coloring} of $\Xi$ in the following way.
 Each pixel $\pix\in\Xi$ can only be assigned one color. The set of colors is $C = \{c_1,\dots c_m\}\cup\{b\}$, where $c_i$ is the color of the input polygon $A_i$ and $b$ is the background color.
 Formally the coloring is then a map $f:\Xi\to C$.
-Let ${\cal X}_f=\{X_1,\dots, X_m\}$ or short ${\cal X)$ be the set of grid polygons induced by $f$.
+Let ${\cal X}_f=\{X_1,\dots, X_m\}$ or short ${\cal X}$ be the set of grid polygons induced by $f$.
 
 \begin{definition}
 A coloring is \emph{valid}, iff the following holds:
