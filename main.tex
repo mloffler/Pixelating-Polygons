@@ -50,14 +50,16 @@
 
 \section{Introduction}
 
-Given a set of simple polygons $\cal A$, we wish to assign each $A \in \cal A$ to a grid polygon (defined formally in Section~\ref {sec:prelims}) $X$ which represents $A$.
+Given a set of disjoint simply connected regions $\cal R$, we wish to assign each $R \in \cal R$ to a grid polygon $P$ (defined formally in Section~\ref {sec:prelims}) which represents $R$.
 
+%We focus on the case where each $R$ is a simple polygon. 
+\maarten {I dropped the assumption that the input regions are polygons - all our combinatorial bounds also apply to the case where $R$ is any simply connected region (i.e. its boundary is a closed curve, but not necessarily polygonal). We also don't have any bounds that depend on the number of vertices of $R$. It makes a difference when we want to actually compute the pixel polygons, but I think we will not focus on that, and when we do make a remark about it we can simply say that the remark applies to the case where the regions are polygonal.  Finally, it makes the choice of letters more logical, we can use $P$ for the output Pixel-Poligon. :)}
 
-%To successfully map a disjoint hole $h_i$ we need to outline its border as a disjoint cycle of black cells.
+%To successfully map a disjoint hole $R_i$ we need to outline its border as a disjoint cycle of black cells.
 
 %Now suppose that for two holes $h_1, h_2 \in H$ their border is present in the same cell $\pix \in G$. We could color the cell black, and say that the pixel is part of both the border of $h_1$ and of $h_2$. But in this case, the holes $h_1$ and $h_2$ intersect one another, whereas in the original drawing $A$ this was not the case. The only option that we have, is to stretch and transpose $A$, such that only one of the two holes has its border in $\pix$.
 
-One way to measure how much we needed to "stretch" the original polygons is to measure the symmetrical Hausdorff distance between $A_i$ and its mapping $X_i$. 
+One way to measure how much we needed to "stretch" the original polygons is to measure the symmetrical Hausdorff distance between $R_i$ and its mapping $P_i$. 
 We require that the Hausdorff distance between the boundaries of the polygons is limited and also that the Hausdorff distance between the points inside the polygons is limited.
 Let $\eps$ be the maximum allowed Hausdorff distance, called \emph{stretch}.
 \maarten {What is the intuition behind the use of the word "stretch" here? I would juse say "similarity" (or distance, or something like that).}
@@ -65,10 +67,10 @@ Let $\eps$ be the maximum allowed Hausdorff distance, called \emph{stretch}.
 \iffalse
 Formally this means: $\forall i\in \{1, m\}$
 \begin{itemize}
-	\item $\forall s\in \partial A_i, \exists t\in \partial X_i, |st|\leq \eps$
-	\item $\forall s\in \partial X_i, \exists t\in \partial A_i, |st|\leq \eps$
-	\item $\forall s\in  A_i, \exists t\in  X_i, |st|\leq \eps$
-	\item $\forall s\in  X_i, \exists t\in  A_i, |st|\leq \eps$
+	\item $\forall s\in \partial R_i, \exists t\in \partial P_i, |st|\leq \eps$
+	\item $\forall s\in \partial P_i, \exists t\in \partial R_i, |st|\leq \eps$
+	\item $\forall s\in  R_i, \exists t\in  P_i, |st|\leq \eps$
+	\item $\forall s\in  P_i, \exists t\in  R_i, |st|\leq \eps$
 \end{itemize}
 where $|\cdot|$ denotes Euclidean distance.
 \fi
@@ -128,7 +130,7 @@ an element $\pix \in \Xi$ is a subset of $\R^2$ of the form $[a,a+1]\times[b,b+1
 For a given set of pixels $X \subset \Xi$, we denote the region $\cup_{\pix \in X}\pix$ covered by $X$ simply by $\cup(X)$, and we write $\partial(X)$ for the boundary of $\cup(X)$.
 
 \begin{definition}
-A {\em simple grid polygon} is a set of pixels $X \subset \Xi$ for which $\partial(X)$ is a single closed curve.
+A {\em simple grid polygon} $P = \cup(X)$ is the union of a set of pixels $X \subset \Xi$ for which $\partial(X)$ is a single closed curve.
 \end{definition}
 
 \maarten {Not sure we need the following definitions.}
@@ -149,35 +151,35 @@ The {\em Hausdorff distance}~\cite{} between two sets $A, B \subset \R^2$ is def
 
 Note that the Hausdorff distance between any two closed sets is equal to the Hausdorff distance between the boundaries of those sets.
 
-Let $A$ be a simple polygon (with real-valued coordinates), and let $X$ be a simple grid polygon.
+Let $R$ be a simply connected region, and let $P$ be a simple grid polygon.
 
 \begin{definition}
-We say $A$ and $X$ are {\em $\eps$-similar} if $H(A,\partial(X)) \le \eps$. 
+We say $R$ and $P$ are {\em $\eps$-similar} if $H(R,P) \le \eps$. 
 \end{definition}
 
 
 \paragraph {Problem statement.}
 
-Consider a set of $m$ simple polygons $\mathcal{A} = \{A_1, A_2, \ldots, A_m\}$ in $\mathbb{R}^2$ with $n$ vertices in total.
-We wish to assign to each $A_i$ a distinct subset $X_i$ of $\Xi$ such that $X_i$ is a simple grid polygon and $X_i$ is $\eps$-similar to $A_i$.
-We further require that the grid polygons are sufficiently spaced; that is, $\partial(X_i) \cap \partial(X_j) = \emptyset \forall i \ne j$. \maarten {Do we? Or do we only require the actual sets of pixels to be disjoint? It doesn't really matter, so what we do depends on the story we tell in the introduction, I think.}
+Consider a set of $m$ simply connected regions $\mathcal{R} = \{R_1, R_2, \ldots, R_m\}$ in $\mathbb{R}^2$.
+We wish to assign to each $R_i$ a simple grid polygon $P_i$ such that $P_i$ is $\eps$-similar to $R_i$.
+We further require that the grid polygons are sufficiently spaced; that is, $\partial(P_i) \cap \partial(P_j) = \emptyset \forall i \ne j$. \maarten {Do we? Or do we only require the actual sets of pixels to be disjoint? It doesn't really matter, so what we do depends on the story we tell in the introduction, I think.}
 
 \maarten {The following is an equivalent interpretation of the problem, which could help with the intuition and/or be used in the technical sections. If we don't use it, we might not want to define it.}
 
 We may interpret a solution as a {\em coloring} of $\Xi$ in the following way.
-Each pixel $\pix\in\Xi$ can only be assigned one color. The set of colors is $C = \{c_1,\dots c_m\}\cup\{b\}$, where $c_i$ is the color of the input polygon $A_i$ and $b$ is the background color.
+Each pixel $\pix\in\Xi$ can only be assigned one color. The set of colors is $C = \{c_1,\dots c_m\}\cup\{b\}$, where $c_i$ is the color of the input region $R_i$ and $b$ is the background color.
 Formally the coloring is then a map $f:\Xi\to C$.
-Let ${\cal X}_f=\{X_1,\dots, X_m\}$ or short ${\cal X}$ be the set of grid polygons induced by $f$.
+Let ${\cal P}_f=\{P_1,\dots, P_m\}$ or short ${\cal P}$ be the set of grid polygons induced by $f$.
 
 \begin{definition}
 A coloring is \emph{valid}, iff the following holds:
 \begin{enumerate}
 	\item When two adjacent pixels have a different color, the one of them must be $b$. That way no two polygons touch.
-	\item For each polygon $h_i$ the pixels colored $c_i$ is simple. Let $p_i$ be the polygon formed by those pixels.
-	\item The polygon $p_i$ formed by the pixels colored does not contain holes.
+	\item For each polygon $R_i$ the pixels colored $c_i$ is simple. Let $P_i$ be the polygon formed by those pixels.
+	\item The polygon $P_i$ formed by the pixels colored does not contain holes.
 \end{enumerate}
 
-%If we want to use the same definition as Bouts~\emph{et al.}, we also request that the pixels on the boundary of $p_i$ form a simple cycle without chords. Informally this means that $p_i$ does not contain holes.
+%If we want to use the same definition as Bouts~\emph{et al.}, we also request that the pixels on the boundary of $P_i$ form a simple cycle without chords. Informally this means that $P_i$ does not contain holes.
 %\jerome{But that way we can have a rectangle + one pixel, because the boundary is then a cycle with a leaf\dots (???)}
 \end{definition}
 
@@ -198,10 +200,10 @@ The superpixels induce the graph $G$ is the same way that the pixels induce $G$.
 For a pixel $\pix$ we denote by $a(\pix)\in \mathbb{R}$ the set of points covered by $\pix$. Similarly for a superpixel $\spix$ we denote by $a(\spix)$ the set of points covered by the pixels in $\spix$. A polygon $q$ \emph{intersects} (super)pixel $o$ if $q\cap a(o)\neq \emptyset$. A polygon $q$ \emph{contains} (super)pixel $o$ if $a(o)\subseteq q$. 
 
 \begin{definition}
-For a fixed $i\in \{1, m\}$ and a valid coloring $C$ of $A$ using the pixels of $S$ and a given superpixel grid $\spg$, the polygon $p_i$ \emph{respects} $\spg$, if the following holds for each $\spix\in \spg$:
+For a fixed $i\in \{1, m\}$ and a valid coloring $C$ of $A$ using the pixels of $S$ and a given superpixel grid $\spg$, the polygon $P_i$ \emph{respects} $\spg$, if the following holds for each $\spix\in \spg$:
 \begin{enumerate}
-	\item if $h_i$ contains a superpixel, then so does $p_i$ and vis-versa,
-	\item if $h_i$ intersects a superpixel, then so does $p_i$ and vis-versa.
+	\item if $R_i$ contains a superpixel, then so does $P_i$ and vis-versa,
+	\item if $R_i$ intersects a superpixel, then so does $P_i$ and vis-versa.
 \end{enumerate}
 \end{definition}
 
@@ -264,7 +266,7 @@ overlay everything with superpixels:
 	%\item for each poly that has superpixels, but they are not connected, connect them using SPs where the poly is present
 	\item then for each poly not yet present at all: choose random pixel in a SP where you are.
 \end{enumerate}
-This means Lemma~\ref{lem:respect_means_bound} is not completely fulfilled. We did not make sure that each polygon $p_i$ is present in each SP that $h_i$ intersects. But due to the fatness, we know that we are at least present in a ~close-by SP. We just have to prove that this is a constant and then we are done using a proof similar to the lemma.
+This means Lemma~\ref{lem:respect_means_bound} is not completely fulfilled. We did not make sure that each polygon $P_i$ is present in each SP that $R_i$ intersects. But due to the fatness, we know that we are at least present in a ~close-by SP. We just have to prove that this is a constant and then we are done using a proof similar to the lemma.
 
 
 (Note that if the regions are not convex, then the polygons could be disconnected.)
@@ -313,7 +315,7 @@ We then do the same for vertical lines thus creating: $y: \{1, m\}\to \{1, m\}, 
 
 Each superpixel has side length $2\times h+1$. The pixel $(2\times x(i), 2\times y(i))$ is colored $c_i$.
 
-Then for each pair of adjacent SPs we check which polygons intersect it. For each such polygon $h_i$ we connect the two pixels in the two SPs using a straight lines of pixels.
+Then for each pair of adjacent SPs we check which polygons intersect it. For each such polygon $R_i$ we connect the two pixels in the two SPs using a straight lines of pixels.
 
 Finally whenever four SPs forming a square all contain a certain color $c_i$, then we color the square formed by those pixel in.
 
@@ -407,7 +409,7 @@ Everything outside $\ixi$ can easily be drawn without much stretch.
 % Also for everything outside $\mathcal{I}$, there is not much choice for the coloring (topologically). Area $\ixi$ is the problem here.
 Note that at the top and the bottom we have $3k+3$ "connections" each. In $\ixi$ the pixels are colored in $c_1$ (red), $c_2$ (green) and $c_3$ (blue) such that in the end, the three polygons $p_1$, $p_2$ and $p_3$ induced by the three colors are connected.
 
-%Let $\spg$ be a superpixel grid of size $f(\ell)$ \jerome{to be determined} aligned like in Figure~\draw. The input polygons $h_i$ intersect all of the superpixels in $\ixi$. \jerome{take care to make a small wiggle in the corners of the $\ixi$ so that this holds.}
+%Let $\spg$ be a superpixel grid of size $f(\ell)$ \jerome{to be determined} aligned like in Figure~\draw. The input polygons $R_i$ intersect all of the superpixels in $\ixi$. \jerome{take care to make a small wiggle in the corners of the $\ixi$ so that this holds.}
 %Just outside of $\ixi$ the superpixels blibla \todo{insert coordinates} all need to contain the colors redorgreenorblue.
 
 Due to the choice of $\ixi$ we have that no pixel outside $\ixi$ and the loops is colored.
@@ -610,11 +612,11 @@ Fix an index on the holes: $H := \{ h_1, h_2 ... h_h \}$ and fix a 2-dimensional
 For each grid cell $\hfill\pix$ we check which holes in $A$ intersect $\hfill\pix$ and we mark $\hfill\pix$ with these holes.
 
 \begin{observation}
-If in our projection each hole $h_i$ is a connected tree which spans all grid cells marked by $h_i$ then the symmetrical Hausdorff distance is $\Theta(d2^h)$.
+If in our projection each hole $R_i$ is a connected tree which spans all grid cells marked by $R_i$ then the symmetrical Hausdorff distance is $\Theta(d2^h)$.
 \end{observation}
 
 \begin{definition}[The iteration invariant]
-In our proposed algorithm. After inserting hole $h_i$, every hole $h_j$ with $j \le i$ is a spanning tree. Where the tree has as least one vertex in each cell marked by $h_j$ and edges between vertices are orthogonal.
+In our proposed algorithm. After inserting hole $R_i$, every hole $h_j$ with $j \le i$ is a spanning tree. Where the tree has as least one vertex in each cell marked by $h_j$ and edges between vertices are orthogonal.
 \end{definition}
 
 
@@ -622,15 +624,15 @@ Our algorithm works as follows: We start by inserting $h_1$ as an orthogonal MST
 
 
 
-For all remained holes $h_i$ we do the following:
+For all remained holes $R_i$ we do the following:
 
 \paragraph*{Step 1}
 We start by adding a (orthogonal) closed face around each hole $h_j$ with $j < i$ in the following way:
 For each hole $h_j$ with $j < i$, for each edge $(a,b)$ we add four vertexes: $x_a, y_a, x_b, y_b$.  $x_a, x_b$ and $y_a,y_b$ are always connected with an orthogonal edge. If $a$ is a leaf, then $x_a,y_a$ are connected with an orthogonal edge and the same holds for $x_b,a_b$. Else per construction these edges are connected to another vertex. This creates an orthogonal face around each hole $h_j$.
-Lastly we glue the holes together in the following way: For every pair of edges of $h_i$, if they are parallel, their endpoints pairwise end in the same grid and there is no edge in between, we identify then with one another. 
+Lastly we glue the holes together in the following way: For every pair of edges of $R_i$, if they are parallel, their endpoints pairwise end in the same grid and there is no edge in between, we identify then with one another. 
 
-Each cell $\hfill\pix$ which is marked by $h_i$ and does not contain a vertex of $h_i$, we add a vertex of $h_i$ and we name these vertexes \emph{champions}. In the original drawing $\hfill\pix$ was intersected by $h_i$ and connected. This in particular means that at least one edge of $\hfill\pix$ was intersected by $h_1$. For these edges we add an orthogonal edge from the champion to the cell that shares the edge with $\hfill\pix$. The result is that $h_i$ is connected and that there is a vertex in each cell marked by $h_i$.
-note that after step 1. The iteration invariant holds for all holes $h_j$ with $j < i$ but not for $h_i$. See Figure \ref{fig:cycle} for an example.
+Each cell $\hfill\pix$ which is marked by $R_i$ and does not contain a vertex of $R_i$, we add a vertex of $R_i$ and we name these vertexes \emph{champions}. In the original drawing $\hfill\pix$ was intersected by $R_i$ and connected. This in particular means that at least one edge of $\hfill\pix$ was intersected by $h_1$. For these edges we add an orthogonal edge from the champion to the cell that shares the edge with $\hfill\pix$. The result is that $R_i$ is connected and that there is a vertex in each cell marked by $R_i$.
+note that after step 1. The iteration invariant holds for all holes $h_j$ with $j < i$ but not for $R_i$. See Figure \ref{fig:cycle} for an example.
 
 \begin{figure}[H]
 \centering
@@ -641,9 +643,9 @@ note that after step 1. The iteration invariant holds for all holes $h_j$ with $
 
 \paragraph*{Step 2.}
 
-In step 2. We delete all endpoints of $h_i$ which are in a cell that is not marked by $h_i$. We also delete all edges with less than 2 endpoints. All remaining vertices $x$ which used to have an outgoing edge and have lost it are marked \emph{broken.}
+In step 2. We delete all endpoints of $R_i$ which are in a cell that is not marked by $R_i$. We also delete all edges with less than 2 endpoints. All remaining vertices $x$ which used to have an outgoing edge and have lost it are marked \emph{broken.}
 
-$h_i$ is now a collection of curves with three types of edges:
+$R_i$ is now a collection of curves with three types of edges:
 
 \begin{itemize}
 \item Edges where all endpoints are regular (these are in the interior of a path). We call these \emph{regular edges}
@@ -653,7 +655,7 @@ $h_i$ is now a collection of curves with three types of edges:
 
 
 \begin{observation}
-after the gluing, each of $h_i$ is in at most 2 cycles.
+after the gluing, each of $R_i$ is in at most 2 cycles.
 \end{observation}
 \paragraph*{Step 3.}
 
