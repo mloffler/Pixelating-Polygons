@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
-<ipe version="70206" creator="Ipe 7.2.7">
-<info created="D:20180223160028" modified="D:20180223160121"/>
+<ipe version="70206" creator="Ipe 7.2.9">
+<info created="D:20180223160028" modified="D:20190415140304"/>
 <ipestyle name="bettinacolors">
 <color name="Bettina blue" value="0 0.4 0.796"/>
 <color name="Bettina green" value="0.282 0.557 0"/>
@@ -328,7 +328,7 @@ h
 <page>
 <layer name="alpha"/>
 <view layers="alpha" active="alpha"/>
-<path layer="alpha" stroke="black" dash="W dot ultrafat" pen="2" cap="1" join="1">
+<path layer="alpha" matrix="0.45 0 0 0.45 -6.4 412.4" stroke="black" dash="W dot ultrafat" pen="2" cap="1" join="1">
 192 768 m
 64 768 l
 64 640 l
@@ -337,20 +337,20 @@ h
 128 704 l
 128 640 l
 </path>
-<path stroke="black" dash="W dot ultrafat" pen="2" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 -6.4 412.4" stroke="black" dash="W dot ultrafat" pen="2" cap="1" join="1">
 64 704 m
 128 704 l
 128 768 l
 </path>
-<path stroke="black" dash="W dot ultrafat" pen="2" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 -6.4 412.4" stroke="black" dash="W dot ultrafat" pen="2" cap="1" join="1">
 192 768 m
 192 704 l
 </path>
-<use name="mark/box(sx)" pos="80 736" size="4" stroke="black"/>
-<use name="mark/box(sx)" pos="96 736" size="4" stroke="black"/>
-<use name="mark/box(sx)" pos="112 736" size="4" stroke="black"/>
-<use name="mark/box(sx)" pos="144 752" size="4" stroke="black"/>
-<path matrix="1 0 0 1 256 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<use matrix="0.45 0 0 0.45 -6.4 412.4" name="mark/box(sx)" pos="80 736" size="4" stroke="black"/>
+<use matrix="0.45 0 0 0.45 -6.4 412.4" name="mark/box(sx)" pos="96 736" size="4" stroke="black"/>
+<use matrix="0.45 0 0 0.45 -6.4 412.4" name="mark/box(sx)" pos="112 736" size="4" stroke="black"/>
+<use matrix="0.45 0 0 0.45 -6.4 412.4" name="mark/box(sx)" pos="144 752" size="4" stroke="black"/>
+<path matrix="0.45 0 0 0.45 108.8 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 192 768 m
 64 768 l
 64 640 l
@@ -359,48 +359,48 @@ h
 128 704 l
 128 640 l
 </path>
-<path matrix="1 0 0 1 256 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 108.8 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 64 704 m
 128 704 l
 128 768 l
 </path>
-<path matrix="1 0 0 1 256 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 108.8 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 192 768 m
 192 704 l
 </path>
-<use matrix="1 0 0 1 256 0" name="mark/box(sx)" pos="80 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 256 0" name="mark/box(sx)" pos="96 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 256 0" name="mark/box(sx)" pos="112 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 256 0" name="mark/box(sx)" pos="144 752" size="normal" stroke="black"/>
-<path matrix="1 0 0 1 -48 32" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
+<use matrix="0.45 0 0 0.45 108.8 412.4" name="mark/box(sx)" pos="80 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 108.8 412.4" name="mark/box(sx)" pos="96 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 108.8 412.4" name="mark/box(sx)" pos="112 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 108.8 412.4" name="mark/box(sx)" pos="144 752" size="normal" stroke="black"/>
+<path matrix="0.45 0 0 0.45 -28 426.8" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
 256 832 m
 256 576 l
 512 576 l
 512 832 l
 h
 </path>
-<path matrix="1 0 0 1 -32 32" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
+<path matrix="0.45 0 0 0.45 -20.8 426.8" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
 256 832 m
 256 576 l
 512 576 l
 512 832 l
 h
 </path>
-<path matrix="1 0 0 1 -16 32" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
+<path matrix="0.45 0 0 0.45 -13.6 426.8" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
 256 832 m
 256 576 l
 512 576 l
 512 832 l
 h
 </path>
-<path matrix="1 0 0 1 16 48" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
+<path matrix="0.45 0 0 0.45 0.8 434" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
 256 832 m
 256 576 l
 512 576 l
 512 832 l
 h
 </path>
-<path matrix="1 0 0 1 256 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 108.8 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 192 768 m
 64 768 l
 64 640 l
@@ -409,20 +409,20 @@ h
 128 704 l
 128 640 l
 </path>
-<path matrix="1 0 0 1 256 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 108.8 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 64 704 m
 128 704 l
 128 768 l
 </path>
-<path matrix="1 0 0 1 256 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 108.8 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 192 768 m
 192 704 l
 </path>
-<use matrix="1 0 0 1 256 0" name="mark/box(sx)" pos="80 736" size="3" stroke="black"/>
-<use matrix="1 0 0 1 256 0" name="mark/box(sx)" pos="96 736" size="3" stroke="black"/>
-<use matrix="1 0 0 1 256 0" name="mark/box(sx)" pos="112 736" size="3" stroke="black"/>
-<use matrix="1 0 0 1 256 0" name="mark/box(sx)" pos="144 752" size="3" stroke="black"/>
-<path matrix="1 0 0 1 576 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<use matrix="0.45 0 0 0.45 108.8 412.4" name="mark/box(sx)" pos="80 736" size="3" stroke="black"/>
+<use matrix="0.45 0 0 0.45 108.8 412.4" name="mark/box(sx)" pos="96 736" size="3" stroke="black"/>
+<use matrix="0.45 0 0 0.45 108.8 412.4" name="mark/box(sx)" pos="112 736" size="3" stroke="black"/>
+<use matrix="0.45 0 0 0.45 108.8 412.4" name="mark/box(sx)" pos="144 752" size="3" stroke="black"/>
+<path matrix="0.45 0 0 0.45 252.8 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 192 768 m
 64 768 l
 64 640 l
@@ -431,34 +431,34 @@ h
 128 704 l
 128 640 l
 </path>
-<path matrix="1 0 0 1 576 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 252.8 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 64 704 m
 128 704 l
 128 768 l
 </path>
-<path matrix="1 0 0 1 576 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 252.8 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 192 768 m
 192 704 l
 </path>
-<use matrix="1 0 0 1 576 0" name="mark/box(sx)" pos="80 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 576 0" name="mark/box(sx)" pos="96 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 576 0" name="mark/box(sx)" pos="112 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 576 0" name="mark/box(sx)" pos="144 752" size="normal" stroke="black"/>
-<path matrix="1 0 0 1 384 256" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
+<use matrix="0.45 0 0 0.45 252.8 412.4" name="mark/box(sx)" pos="80 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 252.8 412.4" name="mark/box(sx)" pos="96 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 252.8 412.4" name="mark/box(sx)" pos="112 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 252.8 412.4" name="mark/box(sx)" pos="144 752" size="normal" stroke="black"/>
+<path matrix="0.45 0 0 0.45 166.4 527.6" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
 192 576 m
 192 320 l
 448 320 l
 448 576 l
 h
 </path>
-<path matrix="1 0 0 1 448 256" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
+<path matrix="0.45 0 0 0.45 195.2 527.6" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
 192 576 m
 192 320 l
 448 320 l
 448 576 l
 h
 </path>
-<path matrix="1 0 0 1 576 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 252.8 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 192 768 m
 64 768 l
 64 640 l
@@ -467,20 +467,20 @@ h
 128 704 l
 128 640 l
 </path>
-<path matrix="1 0 0 1 576 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 252.8 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 64 704 m
 128 704 l
 128 768 l
 </path>
-<use matrix="1 0 0 1 576 0" name="mark/box(sx)" pos="80 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 576 0" name="mark/box(sx)" pos="96 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 576 0" name="mark/box(sx)" pos="112 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 576 0" name="mark/box(sx)" pos="144 752" size="normal" stroke="black"/>
-<path matrix="1 0 0 1 576 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<use matrix="0.45 0 0 0.45 252.8 412.4" name="mark/box(sx)" pos="80 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 252.8 412.4" name="mark/box(sx)" pos="96 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 252.8 412.4" name="mark/box(sx)" pos="112 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 252.8 412.4" name="mark/box(sx)" pos="144 752" size="normal" stroke="black"/>
+<path matrix="0.45 0 0 0.45 252.8 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 192 768 m
 192 704 l
 </path>
-<path matrix="1 0 0 1 960 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 425.6 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 192 768 m
 64 768 l
 64 640 l
@@ -489,34 +489,34 @@ h
 128 704 l
 128 640 l
 </path>
-<path matrix="1 0 0 1 960 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 425.6 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 64 704 m
 128 704 l
 128 768 l
 </path>
-<path matrix="1 0 0 1 960 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 425.6 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 192 768 m
 192 704 l
 </path>
-<use matrix="1 0 0 1 960 0" name="mark/box(sx)" pos="80 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 960 0" name="mark/box(sx)" pos="96 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 960 0" name="mark/box(sx)" pos="112 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 960 0" name="mark/box(sx)" pos="144 752" size="normal" stroke="black"/>
-<path matrix="1 0 0 1 768 256" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
+<use matrix="0.45 0 0 0.45 425.6 412.4" name="mark/box(sx)" pos="80 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 425.6 412.4" name="mark/box(sx)" pos="96 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 425.6 412.4" name="mark/box(sx)" pos="112 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 425.6 412.4" name="mark/box(sx)" pos="144 752" size="normal" stroke="black"/>
+<path matrix="0.45 0 0 0.45 339.2 527.6" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
 192 576 m
 192 320 l
 448 320 l
 448 576 l
 h
 </path>
-<path matrix="1 0 0 1 832 256" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
+<path matrix="0.45 0 0 0.45 368 527.6" stroke="black" fill="Bettina yellow" pen="1" cap="1" join="1" opacity="30%">
 192 576 m
 192 320 l
 448 320 l
 448 576 l
 h
 </path>
-<path matrix="1 0 0 1 960 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 425.6 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 192 768 m
 64 768 l
 64 640 l
@@ -525,41 +525,41 @@ h
 128 704 l
 128 640 l
 </path>
-<path matrix="1 0 0 1 960 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 425.6 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 64 704 m
 128 704 l
 128 768 l
 </path>
-<use matrix="1 0 0 1 960 0" name="mark/box(sx)" pos="80 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 960 0" name="mark/box(sx)" pos="96 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 960 0" name="mark/box(sx)" pos="112 736" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 960 0" name="mark/box(sx)" pos="144 752" size="normal" stroke="black"/>
-<path matrix="1 0 0 1 960 0" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
+<use matrix="0.45 0 0 0.45 425.6 412.4" name="mark/box(sx)" pos="80 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 425.6 412.4" name="mark/box(sx)" pos="96 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 425.6 412.4" name="mark/box(sx)" pos="112 736" size="normal" stroke="black"/>
+<use matrix="0.45 0 0 0.45 425.6 412.4" name="mark/box(sx)" pos="144 752" size="normal" stroke="black"/>
+<path matrix="0.45 0 0 0.45 425.6 412.4" stroke="black" dash="W dot ultrafat" pen="1" cap="1" join="1">
 192 768 m
 192 704 l
 </path>
-<path stroke="black" fill="black" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 -6.4 412.4" stroke="black" fill="black" pen="1" cap="1" join="1">
 1024 832 m
 1024 768 l
 960 768 l
 960 832 l
 h
 </path>
-<path stroke="black" fill="black" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 -6.4 412.4" stroke="black" fill="black" pen="1" cap="1" join="1">
 1024 704 m
 1024 640 l
 960 640 l
 960 704 l
 h
 </path>
-<path stroke="black" fill="black" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 -6.4 412.4" stroke="black" fill="black" pen="1" cap="1" join="1">
 1152 832 m
 1152 768 l
 1088 768 l
 1088 832 l
 h
 </path>
-<path stroke="black" fill="black" pen="1" cap="1" join="1">
+<path matrix="0.45 0 0 0.45 -6.4 412.4" stroke="black" fill="black" pen="1" cap="1" join="1">
 1280 576 m
 1280 640 l
 1216 640 l
