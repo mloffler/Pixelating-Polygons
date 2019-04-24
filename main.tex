@@ -37,440 +37,259 @@
 
 \newcommand{\bigo}{\ensuremath{\mathcal O}}
 
+\newcommand{\etal}{\textnormal{et al.}\xspace}
 \newcommand{\spg}{\mathcal{S\!P}}
 \newcommand{\ixi}{\mathcal{I}}
-\newcommand{\pix}{\square}
+\newcommand{\pix}{\scalebox{0.6}{$\square$}}
 \newcommand{\spix}{\boxplus}
 
 \newcommand{\eps}{\varepsilon}
 \newcommand{\R}{\mathbb{R}}
 
-\title{Pixelating Polygons}
+
+\title{Mapping Multiple Regions to the Grid with Bounded Hausdorff Error}
 \begin{document}
 \maketitle
 
 \section{Introduction}
 
-Given a set of disjoint simply connected regions $\cal R$, we wish to assign each $R \in \cal R$ to a grid polygon $P$ (defined formally in Section~\ref {sec:prelims}) which represents $R$.
+\emph{Digital geometry} is concerned with the proper representation of geometric objects and their relationships using a grid of pixels. This greatly
+simplifies both representation and many operations, but the downside is that common properties on geometric objects no longer hold. For example, it may be that two digitized lines intersect in multiple connected components. How to digitize a set of geometric objects so that such properties are guaranteed is one objective in digital geometry, referred to as \emph{consistency}. Another objective is the presentation of vector objects with bounded error, using subsets of pixels. Here we may assume the unit grid and measure error in one of multiple ways.
 
-%We focus on the case where each $R$ is a simple polygon.
-\maarten {I dropped the assumption that the input regions are polygons - all our combinatorial bounds also apply to the case where $R$ is any simply connected region (i.e. its boundary is a closed curve, but not necessarily polygonal). We also don't have any bounds that depend on the number of vertices of $R$. It makes a difference when we want to actually compute the pixel polygons, but I think we will not focus on that, and when we do make a remark about it we can simply say that the remark applies to the case where the regions are polygonal.  Finally, it makes the choice of letters more logical, we can use $P$ for the output Pixel-Poligon. :)}
+Early results in digital geometry were mostly concerned with consistency and arose in computer vision. For a survey, see Klette and Rosenfeld~\cite{klette2004digitalgeometry,klette2004digital}.
+The interest from the algorithms community is more recent. Besides consistency, the Hausdorff error of digital representations is the topic of study.
+Chun \etal~\cite{chun2009consistent} investigate the problem of digizing rays originating in the origin to digital rays such that certain properties are satisfied. They show that rays can be represented on the $n\times n$ grid in a consistent manner with Hausdorff error $O(\log n)$. This bound is tight in the worst case. By ignoring one of the consistency conditions, the error bound improves to $O(1)$.
+Their research is extended by Christ \etal~\cite{christ2012consistent} to line segments (not necessarily starting in the origin), who obtain
+the logarithmic error bound in this case as well.
+A possible extension to curved rays was developed by Chun \etal~\cite{chun2019consistent}.
+Other results with a digital geometry flavor within the algorithms community are those on snap rounding~\cite{de2007intersection,guibas,hershberger}, integer hulls~\cite{Althaus04,Harvey99}, and discrete schematization~\cite{loffler2017discretized}.
 
-%To successfully map a disjoint hole $R_i$ we need to outline its border as a disjoint cycle of black cells.
+%The main motivation for using digital geometry is the fact representations are very simple and operations are simple, robust, and easily parallelizable. 
+%it has also a large number of theoretical applications within computational geometry such as in snap rounding~\cite{de2007intersection}, integer precision geometry~\cite{harvey1999computing} and discrete schematization~\cite{loffler2017discretized}.
 
-%Now suppose that for two holes $R_1, R_2 \in H$ their border is present in the same cell $\pix \in G$. We could color the cell black, and say that the pixel is part of both the border of $R_1$ and of $R_2$. But in this case, the holes $R_1$ and $R_2$ intersect one another, whereas in the original drawing $A$ this was not the case. The only option that we have, is to stretch and transpose $A$, such that only one of the two holes has its border in $\pix$.
+\begin{figure}[htb]
+\centering
+\includegraphics[]{introfig.pdf}
+\caption{Three disjoint simply-connected regions and a representation by simply-connected sets of pixels.}
+\label{fig:intro}
+\end{figure}
 
-One way to measure how much we needed to "stretch" the original polygons is to measure the symmetrical Hausdorff distance between $R_i$ and its mapping $P_i$.
-We require that the Hausdorff distance between the boundaries of the polygons is limited and also that the Hausdorff distance between the points inside the polygons is limited.
-Let $\eps$ be the maximum allowed Hausdorff distance, called \emph{similarity}.
-%\maarten {What is the intuition behind the use of the word "stretch" here? I would juse say "similarity" (or distance, or something like that).}
-
-\iffalse
-Formally this means: $\forall i\in \{1, m\}$
-\begin{itemize}
-	\item $\forall s\in \partial R_i, \exists t\in \partial P_i, |st|\leq \eps$
-	\item $\forall s\in \partial P_i, \exists t\in \partial R_i, |st|\leq \eps$
-	\item $\forall s\in  R_i, \exists t\in  P_i, |st|\leq \eps$
-	\item $\forall s\in  P_i, \exists t\in  R_i, |st|\leq \eps$
-\end{itemize}
-where $|\cdot|$ denotes Euclidean distance.
-\fi
-
-The goal of this paper is to find a mapping where the similarity is asymptotically minimized. In this work we look at different types of polygons and the theta-bounds on the Hausdorff distance. See the table below for a summary of the results.
-See Figure \ref{fig:pixelexample} for an example.
-
-%\begin{definition}
-%Suppose $H$ is a collection of holes $R_1 ... R_m$. Let $b_1 ... b_m$ be the borders of $R_1 ... R_m$ and let $f(H)$ be the projection of $H$ onto the grid.
-
-%We say the projection $f$ is \textbf{valid} if there is a bijection $g$ between $\{ b_1 ... b_m \}$ and a set of disjoint black cycles in $f(H)$.
-%\end{definition}
-
-%\begin{lemma}
-%\label{lemma:expand}
-%\jerome{This is wrong!!!} \jerome{It is rather that for each grid polygon that we create, this holds.}
-%Let $H$ be a collection of holes. If there exists a valid projection $f$, where for each border $b_i$, the symmetrical Hausdorff distance between $b_i$ and $g(b_i)$ is $\Theta( X)$, then the symmetrical Hausdorff distance between $H$ and $f(H)$ is $\Theta(X)$.
-%\end{lemma}
-
-%This lemma allows us to focus on only projecting the boundaries of a hole.
+In a recent paper, Bouts \etal~\cite{bouts2016mapping} showed that any simple polygon, no matter how detailed, can be represented by a simply-connected set of pixels such that the Hausdorff distance to and from the input is bounded by the constant $3\sqrt{2}/2$. They also prove that for the Fr\'echet distance between the boundaries, a constant error is not possible.
+In this paper we extend the former result to multiple regions, see Figure~\ref{fig:intro} for an example. Depending on the size and shape characteristics of the regions, we obtain different bounds. We express our bounds in the number of regions to be represented by pixels. The precise results are given in Table~\ref{table:results}.
 
 
-%\begin{figure}[H]
-%\centering
-%\includegraphics[width=150px]{Figures/pixelexample.pdf}
-%\caption{\jerome{redo}
-%Left is $A$: A simple polygon with $m=3$ holes. To the right is the projection $B$ to pixels with diameter $d$ with a symmetrical Hausdorff distance less than $2*d$.
-%}
-%\label{fig:pixelexample}
-%\end{figure}
-
+In this paper we consider a set $\mathcal{R}$ of $m$ simply connected regions and we wish to assign to each $R \in \mathcal{R}$ a simply connected set of pixels which represents $R$.
+We investigate various restrictions on the set of regions $\mathcal{R}$ and we show that stricter restrictions allow for pixel representations with a smaller symmetric Hausdorff distance.
 
 
 
 \begin{table}[H]
 \begin{tabular}{lcc}
 \toprule
-Restrictions on the regions & Lower bound & Upper bound  \\ \midrule
+Type of regions & Lower bound & Upper bound  \\ \midrule
 point regions & $\Omega(\sqrt[]{m}) $ & $\bigo(\sqrt[]{m})$ \\
-$\beta$-fat regions & $\Omega(\sqrt[]{m}) $ & $\bigo(\sqrt[]{m})$ \\
+convex $\beta$-fat regions & $\Omega(\sqrt[]{m}) $ & $\bigo(\sqrt[]{m})$ \\
 convex regions & $\Omega(m) $ & $\bigo(m)$ \\
-two unrestricted regions &  $\Omega(1)$ & $\bigo(1)$\\
-three unrestricted regions &  \multicolumn{2}{c}{unbounded}\\
-\bottomrule
+two general regions &  $\Omega(1)$ & $\bigo(1)$\\
+three general regions &  \multicolumn{2}{c}{unbounded}\\
+\bottomrule\\
 %$\Omega(2^m)$ & $\bigo(2^m)$ \\ \hline
 \end{tabular}
+\caption{A table representing our results for various restrictions on $\mathcal{R}$.}
+\label{table:results}
 \end{table}
 
+\subparagraph{Notation and definitions.}
+We denote by $\Gamma$ the (infinite) unit grid, whose unit squares are referred to as \emph{pixels}. 
+%By $G_k \subset \Gamma$ we denote a \emph{subgrid of size} $k$, that is, an axis-aligned square that contains exactly $k \times k$ pixels of $\Gamma$. 
+The {\em (symmetrical) Hausdorff distance} between two sets $A, B \subset \R^2$ is defined as $H(A, B) = \max \{\max_{a \in A}(\min_{b \in B}(|ab|)), \max_{b \in B}(\min_{a \in A}(|ab|))\}$. 
+%Observe that the Hausdorff distance between any two closed sets is equal to the Hausdorff distance between their boundaries.\jordi{This is not true, the previous paper only proved this for the polygons that were being pixelised}
+  
+Consider a set of $m$ disjoint simply-connected regions $\mathcal{R} = \{R_1, R_2, \ldots R_m \}$ in the plane.
+%that are contained in $G_k$ for some value of $k$. 
+In this paper, we wish to assign to each region $R_i \in \mathcal{R}$ a simply-connected subset of the pixels $P_i \subset \Gamma$, such that the result is a set of $m$ disjoint simply-connected regions.
+Two such \emph{grid polygons} are disjoint if they do not meet in any edge or vertex of the grid. A pixel polygon is connected if its pixels are connected by edge adjacency. A grid polygon is simply-connected if it is connected and its complement is also connected by edge adjacency. 
+Hence, we do not allow vertex adjacency at all as it is ambiguous. In this paper a grid polygon is by default simply-connected.
+We call the set $P_1, P_2, \ldots, P_m$ of such grid polygons a \emph{valid assignment}. An example is given in Figure~\ref{fig:intro}.
 
-\section{Preliminaries}
-\label {sec:prelims}
+We are interested in finding for any set of regions $\mathcal{R}$ a valid assignment where for each region $R_i \in \mathcal{R}$, its corresponding grid polygon $P_i$ has a (symmetrical) Hausdorff distance to $R_i$ of at most $h$.
+\jerome{and also the boundary?!}
+In general, $h$ will be a function of $m$. We study this problem under several restrictions on $\mathcal{R}$: (1) the set $\mathcal{R}$ is a set of points, (2) the set $\mathcal{R}$ is a set of \emph{fat} convex regions, (3) the set $\mathcal{R}$ is a set of convex regions and (4) the set $\mathcal{R}$ is a set of arbitrary simply-connected regions.
+For each class of restrictions, we derive a different bound on $h$. First we show that there is a set of regions in that class for which any valid assignment contains at least one region $R_i$ with a pixel polygon $P_i$ where $H(R_i, P_i) = \Omega(h)$. Second we show that for any set of regions in that class, we can find a valid assignment such that for all regions $R_i \in \mathcal{R}$ with corresponding grid polygon $P_i$, we have $H(R_i, P_i) = O(h)$. Hence, our bounds are asymptotically tight.
 
-\subparagraph {Simple grid polygons.}
+We may interpret any solution to our problem as a {\em coloring} of $\Gamma$ in the following way:
+each pixel $\pix\in\Gamma$ can only be assigned one color. The set of colors is $C = \{c_1,\dots c_m\}\cup\{b\}$, where $c_i$ is the color of the input region $R_i$ and $b$ is the background color.
+Formally the coloring is then a map $f:\Gamma\to C$. For each region $R_i$, its grid polygon $P_i$ is the union of all pixels in its color. A valid assignment yields a coloring where each color is simply-connected, and the background color $b$ is connected and has $m$ holes, see Figure~\ref{fig:intro}.
 
-Let $\Xi$ be the (infinite) unit grid, which we interpret as a set of {\em pixels} (unit squares):
-an element $\pix \in \Xi$ is a subset of $\R^2$ of the form $[a,a+1]\times[b,b+1]$ for integers $a$ and $b$.
-For a given set of pixels $X \subset \Xi$, we denote the region $\cup_{\pix \in X}\pix$ covered by $X$ simply by $\cup(X)$, and we write $\partial(X)$ for the boundary of $\cup(X)$.
+Our upper bound constructions follow a similar scheme. Let $\Gamma_k$ be a coarsening of the grid $\Gamma$ whose cells have $k\times k$ pixels. These cells are also called \emph{superpixels}. We will determine for each region from $\mathcal{R}$ which superpixels it contains and which ones it properly intersects.
+If a region $R_i$ contains a superpixel, then all pixels of $\Gamma$ in that superpixel will be part of~$P_i$. If $R_i$ properly intersects a superpixel, we ensure that at least one but not all pixels in that superpixel will be part of~$P_i$. A superpixel not intersecting $R_i$ will have no pixels in~$P_i$.
+The challenge that remains is finding a scheme by which each grid polygon becomes simply-connected. Assuming we succeed, then it is relatively straightforward to see that $H(R_i,P_i) \le k\sqrt{2}$. This bound also holds for the symmetric Hausdorff distance between the boundaries of $R_i$ and~$P_i$.
 
-\jordi{I personally find the symbols we use (square, cup) a bit annoying. It seems to make more sense to have $\xi \in \Xi$, and I think the convention is to just write $\partial P$ for the boundary of $P$. Also, do we need to differentiate between a set of pixels $X$ and the region it covers? I.e. can't we just use $X$ to denote the region?}
-
-\begin{definition}
-A {\em simple grid polygon} $P = \cup(X)$ is the union of a set of pixels $X \subset \Xi$ for which $\partial(X)$ is a single, simple closed curve.
-\end{definition}
-
-\maarten {Not sure we need the following definitions.}
-
-\begin{definition}
-Two pixels are \emph{adjacent} iff they share a side.
-\end{definition}
-
-Adjacency induces the graph $G=(\Xi, E)$ with $(v, w)\in E \iff v$ and $w$ are adjacent.
-For $v\in \Xi$, let $N(v)$ be the four neighbors of v. Further for $W\subseteq \Xi$, let $N(W)=\bigcup_{v\in W} N(v)$.
-
-\subparagraph {Similarity.}
-
-The {\em Hausdorff distance}~\cite{} between two sets $A, B \subset \R^2$ is defined as
-\[
-  H(A, B) = \max \{\max_{a \in A}(\min_{b \in B}(|ab|)), \max_{b \in B}(\min_{a \in A}(|ab|))\}
-\]
-
-Note that the Hausdorff distance between any two closed sets is equal to the Hausdorff distance between the boundaries of those sets.
-
-Let $R$ be a simply connected region, and let $P$ be a simple grid polygon.
-
-\begin{definition}
-We define $R$ and $P$ to be {\em $\eps$-similar} if $H(R,P) \le \eps$.
-\end{definition}
+The remainder of this paper is organized as follows. We start with the easy case of point regions in Section~\ref{sec:points} and show an asymptotically tight bound of $\Theta(\sqrt{m})$. Then we proceed with $\beta$-fat convex regions and show the same bound in
+Section~\ref{sec:fat}, assuming $\beta$ is a constant. When the regions are convex but not necessarily fat, we prove a bound of $\Theta(m)$ in Section~\ref{sec:convex}. Finally, we consider general regions and extend the $O(1)$ Hausdorff bound of Bouts \etal~\cite{bouts2016mapping} from one to two regions
+in Section~\ref{sec:general}. In that section we also show that the bound does not extend to more regions: the Hausdorff distance may be unbounded already for three general regions.
 
 
-\subparagraph {Problem statement.}
-
-Consider a set of $m$ disjoint simply-connected regions $\mathcal{R} = \{R_1, R_2, \ldots, R_m\}$ in $\mathbb{R}^2$.
-We wish to assign to each $R_i$ a simple grid polygon $P_i$ such that $P_i$ is $\eps$-similar to $R_i$ and $P_i\cap P_j=\emptyset$.
-We further require that the grid polygons are sufficiently spaced; that is, $\partial(P_i) \cap \partial(P_j) = \emptyset, \forall i \ne j$. \maarten {Do we? Or do we only require the actual sets of pixels to be disjoint? It doesn't really matter, so what we do depends on the story we tell in the introduction, I think.}\jerome{Each of our algorithms produces such a result, i.e., that the boundaries do no touch.}
-\marc{I added that the grid polygons must be disjoint. This by definition implies that they cannot touch; they are closed objects. So we can remove the spacing requirement.}
-When this is the case, we also say that the set of grid polygons $\mathcal{P} = \{P_1, P_2, \ldots, P_m\}$ is {\em $\eps$-similar} to $\cal R$.
-
-The question we are concerned with is: for a given class of regions (i.e.\ points, fat regions, convex regions, general regions) and a given number $m$, what is the smallest value $\eps$ such that for any set of $m$ regions from the class, there always exists an $\eps$-similar set of $m$ grid polygons?
-
-\maarten {The following is an equivalent interpretation of the problem, which could help with the intuition and/or be used in the technical sections. If we don't use it, we might not want to define it.}
-
-We may interpret a solution as a {\em coloring} of $\Xi$ in the following way.
-Each pixel $\pix\in\Xi$ can only be assigned one color. The set of colors is $C = \{c_1,\dots c_m\}\cup\{b\}$, where $c_i$ is the color of the input region $R_i$ and $b$ is the background color.
-Formally the coloring is then a map $f:\Xi\to C$.
-Let ${\cal P}_f=\{P_1,\dots, P_m\}$ or short ${\cal P}$ be the set of grid polygons induced by $f$.
-
-\begin{definition}
-A coloring is \emph{valid}, iff the following holds:
-\begin{enumerate}
-	\item When two adjacent pixels have a different color, then one of them must be $b$. That way no two polygons touch. \marc{Except for vertex-adjacency.}
-	\item For each region $R_i$ the pixels colored $c_i$ is simple. Let $P_i$ be the polygon formed by those pixels.
-	\item The polygon $P_i$ formed by the pixels colored does not contain holes.
-\end{enumerate}
-
-\jordi{Does 2 not imply 3? A simply connected region cannot have holes.}
-
-%If we want to use the same definition as Bouts~\emph{et al.}, we also request that the pixels on the boundary of $P_i$ form a simple cycle without chords. Informally this means that $P_i$ does not contain holes.
-%\jerome{But that way we can have a rectangle + one pixel, because the boundary is then a cycle with a leaf\dots (???)}
-\end{definition}
 
 
-\subparagraph {Superpixels.}
-
-The following concepts will be useful.
-
-For any positive integer $k$, let $k\Xi$ be the unit grid scaled by a factor $k$, that is, the grid consisting of squares of the form $[ka, ka+k] \times [kb, kb+k]$ for integers $a, b$.
-
-\begin{definition}
-%In all of the following chapters we use the following notion:
-A \emph{superpixel} $\spix$ of size $k^2$ is a set of $k^2$ pixels in $\Xi$ whose union is a square in $k\Xi$. %A superpixel grid of size $k^2$ is a set $k\Xi$ of superpixels of length $k$ each such that the following holds:
-%(1) each pixel is in exactly one superpixel,(2) the superpixels are aligned, i.e., $\forall \spix_1, \spix_2\in k\Xi, |N(\spix_1)\cap \spix_2| \in \{0, k\}$.
-\end{definition}
-
-\jordi{using $\spix$ as the symbol makes me think these are smaller than the original pixels...}
-
-\maarten {I simplified the definition by fixing the alignment of a superpixel grid. I think that should be fine and we never need to shift the grid (do we?), but be careful with arguments about superpixel grids.}
-
-The superpixels induce the graph $G$ in the same way that the pixels induce $G$.
-
-%For a pixel $\pix$ we denote by $a(\pix)\in \mathbb{R}$ the set of points covered by $\pix$.
-%\maarten {Not necessary, right now a pixel *is* the set of points covered by it.}
-For a superpixel $\spix$ we denote by $\cup(\spix)$ the union of the pixels in the set, that is, the set of points covered by the pixels in $\spix$.
-%\maarten {The following is kind of obvious, remove?}
-%A region $R$ \emph{intersects} (super)pixel $o$ if $R\cap \cup(o)\neq \emptyset$. A polygon $R$ \emph{contains} (super)pixel $o$ if $\cup(o)\subseteq R$.
-
-\begin{definition}
-For a fixed $i\in \{1, m\}$ and a valid coloring $f$ of $\cal R$ using the pixels of $\Xi$ and a given superpixel grid $k\Xi$, the polygon $P_i$ \emph{respects} $k\Xi$, if the following holds for each $\spix\in k\Xi$:
-\begin{enumerate}
-	\item if $R_i$ contains a superpixel, then so does $P_i$ and vice-versa,
-	\item if $R_i$ intersects a superpixel, then so does $P_i$ and vice-versa.
-\end{enumerate}
-\end{definition}
-
-\jordi{We need to be careful with the definition of containment here, i.e. if a superpixel is considered contained even with its vertices on the boundary of the region, our algorithm for convex regions gives an output that does not respect the superpixel grid.}
-
-\begin{lemma}\label{lem:respect_means_bound}
-Let $\cal R$ be a set of input regions, $\Xi$ be the unit grid and $k\Xi$ a superpixel grid of size $k^2$. Further let $f$ be a valid coloring of $\cal R$ using the pixels of $\Xi$.
-If each polygon in ${\cal P}_f$ respects $k\Xi$, then the similarity of the coloring is at most $\sqrt{2}k$.
-\end{lemma}
-The proof follows by definition.
-
-\jordi{I guess the "grid of size $k^2$" means cells that are $k \times k$. This seems to follow from the definition of $k\Xi$. Adding this statement here makes it sound like we have a grid of $k \times k$ superpixels.}
+%For all cases of $\mathcal{R}$, we follow the same approach to construct the desired result: suppose we are given $\mathcal{R}$ in a grid $G_{c \cdot k}$ for specified constants $c$ and $k$ and that we want to find a valid assignment of pixels $P_1 \ldots P_m$ where for each region $R_i$, $H(R_i, P_i) \le \sqrt{2}c$. Then we partition $G_{c \dot k}$ into $k^2$ \emph{superpixels} $\mathcal{S}$ of \emph{size} $c$ (each superpixel $S \in \mathcal{S}$ is an axis-aligned square containing $c^2$ pixels). Let $R_i$ be a region that intersects a set $\mathcal{S}$ of superpixels. Let $P_i$ be any assignment of pixels that only places pixels in $\mathcal{S}$, and that places at least one pixel in each superpixel in $\mathcal{S}$. Then $H(R_i, P_i) \le \sqrt{2}c$.
 
 \section{Input regions are points.}
 \label{sec:points}
-By examining the problem under the constraint that all input regions are points, we can see that even for the simplest possible regions it is not possible to bound the Hausdorff distance to a constant factor.
+In this section, we assume that $\mathcal{R}$ is a set of points. We will construct a map that assigns points to pixels such that the symmetric Hausdorff distance between each point and its corresponding pixel is bounded. 
+%Surprisingly, we can show that even if the set $\mathcal{R}$ consists of points (which are the simplest form of regions) then it is still not always possible to find a valid assignment whose symmetric Hausdorff distance to $\mathcal{R}$ is bound by a constant: 
+For a lower bound, consider a set of $m$ points $\mathcal{R}$ that all lie within a single pixel. 
+If we want to assign each point to a unique pixel, we clearly need to use $m$ different pixels. Any set of $m$ pixels has diameter $\Omega(\sqrt{m})$, so at least
+one of the point regions will be mapped to a pixel at distance $\Omega(\sqrt{m})$. Requiring disjointness of the pixels increases the lower bound, but only by a constant factor.
 
-%TL;DR
+We now present a scheme that maps any set of $m$ points $\mathcal{R}$ to a set of pixels, such that the symmetric Hausdorff distance between any point and its pixel is at most $\mathcal{O}(\sqrt{m})$. Let $\Gamma_k$ be a coarsening of $\Gamma$ with $k=2\lceil \sqrt{k}\rceil$. Associate each region in 
+$\mathcal{R}$ with the superpixel that contains it. Each superpixel has the space to accommodate $m$ disjoint pixels without using the bottom row and right column by using exactly the odd numbered rows and columns. We make any assignment of the points to these pixels in the same superpixel. The result is easily seen to have Hausdorff distance $O(\sqrt{m})$.
 
-%lower bound:
-%place them all within one pixel
+%The subgrid $G_k$ contains at most $(\lfloor \frac{k}{2\sqrt{m}} \rfloor)^2$ superpixels of size $2\sqrt{m}$. We overlay $G_k$ with a slightly larger grid $G'$ that contains $(\lceil \frac{k}{2\sqrt{m}} \rceil)^2$ superpixels of size $2\sqrt{m}$ each. For every point $R_i$ we identify which superpixel $S \subset G'$ contains $R_i$. Consider the lexicographical order of the pixels in $S$. We assign $R_i$ to the $2i$'th pixel in this lexicographical order. Since the indexing on $\mathcal{R}$ is fixed, each point gets assigned to a unique pixel. Moreover, each point gets assigned to a superpixel of size $2\sqrt{m}$ that contains the point. It follows that we have found an assignment of mutually disjoint pixels that each have a distance of at most $2\sqrt{m}$ to their corresponding point. Thus we conclude:
 
-%upper bound: worst case optimal algorithm
-
-%overlay everything with superpixels, and then place pixels at random
-
-\subsection{Lower Bound}
-\label{sub:points_lower}
-The worst-case lower bound on the similarity when all the regions in \(\cal R\) are points is \(O(\sqrt{m})\). To see why this is true consider the case where all of the regions (points) are located within the same unit square. Since each point must be assigned it's own disjoint region consisting of at least 1 pixel, a set \(X \subset \Xi\) around this square with \(\cup(X)=4m\) is needed to assign each point a pixel. The distance from \(\partial(X)\) to its center, i.e. the square containing the input regions, is then \(O(\sqrt{m})\).
-
-% subsection points_lower (end)
-
-\subsection{Constructive Upper Bound}
-\label{sub:points_upper}
-We will now sketch an algorithm that realizes a worst-case similarity of \(O(\sqrt{m})\) in the case where the regions are points. Showing that our lower bound is tight.
-
-We start by overlaying \(\Xi\) on \(\cal R\). We then create a superpixel \(\spix_i\) for each \(R_i \in \cal R\) with size \((2\sqrt{m})^2\). We place these superpixels such that the pixel containing \(R_i\) is in the center of \(\spix_i\) (the superpixels may overlap). We then iteratively assign each region \(R_i\) their grid polygon \(P_i\), which consists of a single pixel contained somewhere in \(\spix_i\) that is disjoint from all previously assigned polygons. Since each superpixel contains \(4m\) pixels there must always be a pixel we can choose for this, and the assigned pixels have Hausdorff distance \(O(\sqrt{m})\) to the input region. 
-
-% subsection points_upper (end)
-
-%\subsection{(Algorithm)}
-\label{sub:points_algo}
-
-
-
-% subsection points_algo (end)
-
-
-
-% section points (end)
+\begin{theorem}
+If $\mathcal{R}$ is a set of points, it is possible to find a valid assignment such that for each region $R_i \in \mathcal{R}$ with a corresponding region $P_i$, we have $H(R_i, P_i) = \Theta(\sqrt{m})$.
+\end{theorem}
 
 \section{Input regions are convex $\beta$-fat regions.}
 \label{sec:fat}
-TL;DR
 
-lower bound
+A $\beta$-fat region $R$ is a connected region with an assigned center point $p \in R$, such that the incircle of $R$ with center $p$ and the excircle of $R$ with center $p$ have a radius which differs by at most a factor $\beta$. Observe that the only regions which are $1$-fat are disks and points. In this section we consider the class $\mathcal{R}$ of convex $\beta$-fat regions for constant $\beta$. Points are $\beta$-fat regions for \emph{any} $\beta$, so from Section~\ref{sec:points} it follows that for any $m$, there exists a set of $m$ regions for which the symmetric Hausdorff distance between $\mathcal{R}$ and any valid assignment is $\Omega(\sqrt{m})$.
 
-same as above
+We continue to present an algorithm that maps any set of $\beta$-fat convex regions to a valid assignment, such that the symmetric Hausdorff distance between any region $R_i$ and its assigned region $P_i$ is at most $\mathcal{O}(\beta \sqrt{m})$. Let $\mathcal{R}$ be a set of $\beta$-fat regions in a subgrid $G_k$ for a constant $k$. Just as in Section~\ref{sec:points}, we overlay $G_k$ with a slightly larger grid that contains $(\lceil \frac{k}{2\sqrt{m}} \rceil)^2$ superpixels of size $2\sqrt{m}$. Observe that any $\beta$-fat region $R_i$ can intersect at most $8\beta$ superpixels without covering at least one superpixel. This leads to the following algorithm: for each region $R_i$, let $\mathcal{S}_i$ be the set of superpixels that are contained in $R_i$. If $\mathcal{S}_i$ is empty, then we arbitrarily select a superpixel $S$ that is intersected by $R_i$ and we assign $R_i$ to a unique pixel in $S$ according to the procedure in Section~\ref{sec:points}. This unique pixel has a distance of at most $16\beta \sqrt{m}$ to any other point on $R_i$ since else $R_i$ must intersect more than $8\beta$ superpixels which would make $\mathcal{S}_i$ non-empty. If $\mathcal{S}_i$ is not empty, we assign all pixels in each superpixel of $\mathcal{S}_i$ to $R_i$. Because $R_i$ is convex, the set $\mathcal{S}_i$ has to be connected. Moreover, each point of $R_i$ has a distance of at most $16\beta \sqrt{m}$ to the closest filled superpixel, for the same reasons as we presented above. Thus, we conclude the following:
 
-upper bound
-
-overlay everything with superpixels:
-\begin{enumerate}
-	\item if a SP is completely covered $\rightarrow$ color
-	%\item for each poly that has superpixels, but they are not connected, connect them using SPs where the poly is present
-	\item then for each poly not yet present at all: choose random pixel in a SP where you are.
-\end{enumerate}
-This means Lemma~\ref{lem:respect_means_bound} is not completely fulfilled. We did not make sure that each polygon $P_i$ is present in each SP that $R_i$ intersects. But due to the fatness, we know that we are at least present in a ~close-by SP. We just have to prove that this is a constant and then we are done using a proof similar to the lemma.
-
-
-(Note that if the regions are not convex, then the polygons could be disconnected.)
-
-
-\subsection{Lower Bound}
-\label{sub:fat_lower}
-
-
-
-% subsection fat_lower (end)
-
-\subsection{Constructive Upper Bound}
-\label{sub:fat_upper}
-
-
-
-% subsection fat_upper (end)
-
-\subsection{(Algorithm)}
-\label{sub:fat_algo}
-
-
-
-% subsection fat_algo (end)
-
-
-% section fat (end)
-
-\section{Input regions are convex regions.}\label{sec:convex}
-\subsection{Lower Bound}\label{sub:convex_lower}
-
-Let the regions have as their only requirement that they are convex. In that case we can immediately show that the coloring has a lower-bound Hausdorff distance of $\Theta(m)$. The construction is shown in Figure \ref{fig:linesexample}.
-
-\begin{figure}
-\centering
-\includegraphics[scale=0.8]{Figures/linesexample.pdf}
-\caption{The dotted square is a pixel. We can let $m$ vertical lines intersect the pixel. If their length is far greater than $m$, we can only project these regions to $m$ disjoint lines of pixels, which means that the outer lines must have a Hausdorff distance of $\Theta(m)$.}
-\label{fig:linesexample}
-\end{figure}
-
-
-% subsection convex_lower (end)
-
-\subsection{Constructive Upper Bound}
-\label{sub:convex_upper}
-We will describe an algorithm that, given a set of convex regions \(\mathcal{R}\), gives a set of orthoconvex grid polygons \(\mathcal{P}\) such that \(\mathcal{R}\) and \(\mathcal{P}\) are \(\Theta(m)\)-similar.
-
-\begin{observation}\label{obs:convex-ordering}
-Let \(R_1,R_2 \in \mathcal{R}\) be two convex regions. A horizontal line that intersects both regions will have them appear in a certain left-to-right order. There cannot be another horizontal line where this order is reversed. A symmetrical property holds for vertical lines, where there is a top-to-bottom order.
-\end{observation}
-
-\cref{obs:convex-ordering} allows us to define two partial orders \(\preceq_x\) and \(\preceq_y\) on \(\mathcal{R}\): \(R_i \preceq_x R_j\) iff the leftmost point in \(R_i\) does not lie to the right of the leftmost point in \(R_j\), and \(R_i \preceq_y R_j\) iff the topmost point in \(R_i\) does not lie below the topmost point in \(R_j\). Now let \(X_\mathcal{R}\) and \(Y_\mathcal{R}\) be two indices on \(R\) that respect \(\preceq_x\) and \(\preceq_y\), respectively, and let \(k\Xi\) be a superpixel grid with \(k = 2m\). Finally, for any superpixel \(\spix \in k\Xi\), we denote by \(\spix[x, y]\) the pixel that is the \(2x\)th from the left and \(2y\)th from the top within \(\spix\).
-
-Our algorithm works as follows:
-
-\begin{enumerate}
-	\item For each superpixel \(\spix\) that is intersected by a region \(R_i\), we color \(\spix[X_\mathcal{R}(R_i), Y_\mathcal{R}(R_i)]\) with \(c_i\).
-	\item For any two pixels that are colored with \(c_i\) in adjacent superpixels, we color all pixels on the straight line segment between them with \(c_i\) as well.
-	\item For any four superpixels that form a cycle in \(G\), if they each contain a pixel colored with \(c_i\) in Step 1, we color all pixels in the square between these pixels with \(c_i\) as well.
-\end{enumerate}
-
-\noindent
-See \cref{fig:convexprojection} for an illustration.
-
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{Figures/convexprojection.pdf}
-\caption{The coloring algorithm for convex regions. (a) shows the input of four convex regions, overlaid onto a superpixel grid with \(k = 8\). (b) shows the pixels colored in Step 1 of the algorithm. (c) shows the final coloring obtained after Steps 2 and 3.}
-\label{fig:convexprojection}
-\end{figure}
-
-Let \(f\) be the coloring obtained by the algorithm above.
-
-\begin{lemma}\label{lem:convex-simply-connected}
-	The polygons induced by \(f\) are simply connected.
-\end{lemma}
-\begin{proof}
-	Consider a polygon \(P_i\) induced by \(f\). Its connectedness follows directly from the connectedness of the polygons in the input: \(R_i\) must intersect a connected set of superpixels, and our algorithm connects all of these together. It also cannot contain holes: the presence of a hole would imply that the set of superpixels intersected by \(R_i\) contains a hole, which is not possible due to \(R_i\) being simply connected and convex.
-\end{proof}
-
-\begin{lemma}\label{lem:convex-separated}
-	The polygons induced by \(f\) are separated by the background color.
-\end{lemma}
-\begin{proof}
-	The coloring obtained in Step 1 is separated by construction; it remains to be shown that the pixels colored in Steps 2 and 3 are also separated.
-
-	In Step 2, we only color horizontal and vertical sequences of pixels, and as each color has a unique row and column in each superpixel, it suffices to show that a horizontal sequence of color \(c_i\) never intersects a vertical sequence of color \(c_j\). Assume that two such sequences do intersect; there must be one superpixel \(S\) in which both colors are present. From \(S\), the horizontal sequence extends to the superpixel to the left or right, and the vertical sequence extends to the superpixel above or below. Assume w.l.o.g. one color appears in pixel \(S[x,y]\) and extends to the right, and that another color appears in pixel \(S[u,v]\) and extends downward (the other cases are symmetrical).
-
-	As the sequences intersect, we have that \(x \leq u\) and \(v \leq y\). This implies that \(R_i \preceq_x R_j\) and \(R_j \preceq_y R_i\); note that either of these orders needs to be strict, otherwise \(R_i\) and \(R_j\) intersect. This means that either \(R_i\) contains a point strictly to the left of the leftmost point of \(R_j\), and \(R_j\) crosses from above \(R_i\) to below, or \(R_j\) contains a point strictly above the topmost point of \(R_i\), and \(R_i\) crosses from the left of \(R_j\) to the right. Both cases imply that \(R_i\) and \(R_j\) intersect, which contradicts our assumptions on the input. We conclude that no horizontal and vertical sequence can intersect, and that therefore Step 2 maintains the separation of colors.
-
-	For Step 3 to cause an intersection, we would need to have a pixel \(S[x,y]\) with color \(c_i\) inside a region being filled with color \(c_j\). Let \(S[u,v]\) be the pixel in \(S\) with color \(c_j\); assume w.l.o.g. that \(x > u\) and \(y > v\) (again, the other cases are symmetrical). For an intersection to occur, we must be filling a square with color \(c_j\) to the bottom right from \(S[u,v]\). By the same argument as used for Step 2, this means that \(R_j\) crosses from the top or left of \(R_i\) to the right or bottom, which is only possible if \(R_i\) and \(R_j\) intersect.
-
-	We conclude that none of the steps in the algorithm can violate the separation of the colors in \(f\), which implies that the induced polygons are separated by the background color.
-\end{proof}
 
 \begin{theorem}
-	The polygons \(\mathcal{P}\) induced by \(f\) are \(\Theta(m)\)-similar to \(\mathcal{R}\).
+If $\mathcal{R}$ is a set of $\beta$-fat convex regions for a constant $\beta$, it is possible to find a valid assignment such that for each region $R_i \in \mathcal{R}$ with a corresponding region $P_i$, $H(R_i, P_i) = \Theta(\beta\sqrt{m})$.
 \end{theorem}
+
+
+\section{Input regions are convex regions.}\label{sec:convex}
+
+In this section, we consider the class of convex regions (which is a less-restricted class than the class in Section~\ref{sec:fat}). Since this class is less restricted than the previous discussed classes, it is not surprising that we obtain a worse lower-bound on the minimal Hausdorff distance between a set of regions and any valid assignment: consider a set $\mathbb{R}$ of $m$ vertical lines that each have a length of $m^2$ pixels, whose center points lie within a square of diameter of $\frac{1}{4}$. Suppose we want to find a valid assignment where for each region, the symmetric Hausdorff distance to its assigned pixels is at most $\mathcal{O}(m)$. Because each line $R_i$ has a length of $\mathcal{O}(m^2)$ pixels, its assigned set of pixels must also have a length of $\mathcal{O}(m^2)$ pixels (else the vertical distance between the line and an assigned pixel is $\mathcal{O}(m^2)$ which is more than the $\mathcal{O}(m)$ that we aim for). Any set $m$ of mutually disjoint, connected pixel regions with a length of $\mathcal{O}(m^2)$ pixels must have a width of at least $m$ pixels and it follows that the symmetric Hausdorff distance between $\mathcal{R}$ and any valid assignment is at least $\Omega(m)$.
+
+Let $\mathcal{R}$ be a set of $m$ convex regions in a grid $G_k$. Consider a vertical sweep line that sweeps $G_k$ from left to right. Under the assumption of general position, the regions in $R_i$ are hit by the sweep line in a unique order. We denote by $<_x$ this unique order. We define $<_y$ similarly based on a top-down sweep of $G_k$. We overlay $G_k$ with a slightly larger grid $G'$ that contains $(\lceil \frac{k}{2m} \rceil)^2$ superpixels of size $2m$ each. For each region $R \in \mathcal{R}$, let $\mathcal{S}$ be the set of superpixels intersected by $R$. Suppose $R$ is the $i$'th region in the order $<_x$ and the $j$'th region in the order $<_y$. Then for every superpixel $S \in \mathcal{S}$, we assign the unique pixel of $S$ to $R$ which is the $(2i)$'th pixel from the left border of $S$ and the $(2j)$'th pixel from the top border of $S$. We call this pixel the \emph{representative pixel} of $R$ in $S$. We connect all the pixels assigned to $R$ with arbitrary vertical and horizontal line segments between representative pixels.
+Lastly, we fill in the areas that are surrounded by these connections in order to make the grid polygon simply-connected.
+
+\begin{figure}[tb]
+\centering
+\includegraphics[]{intersection.pdf}
+\caption{An assignment of pixels such that two assigned polygons (the blue and the orange) intersect whenever you connect the pixels. }
+\label{fig:intersection}
+\end{figure}
+
+\begin{lemma}
+For any two regions $R, R' \in \mathcal{R}$, their sets of assigned pixels are mutually disjoint.
+\end{lemma}
+
 \begin{proof}
-	By \cref{lem:convex-simply-connected,lem:convex-separated}, \(f\) is a valid coloring. By construction, \(P_i\) intersects any superpixel that \(R_i\) does. Furthermore, any \(R_i\) that contains a superpixel \(S\) necessarily intersects all surrounding superpixels. As such, \(S\) will be completely filled with color \(c_i\) in Step 3 of the algorithm, implying that \(P_i\) also contains \(S\). These two facts combined imply that \(f\) respects the superpixel grid, which lets us apply \cref{lem:respect_means_bound} to obtain the bound.
+We denote by $P$ the set of pixels assigned to $R$ and by $P'$ the set of pixels assigned to $R'$. Suppose for the sake of contradiction that $P$ and $P'$ intersect at a point within a superpixel $S$. Observe that there are never two vertical line segments in $P$ and $P'$ that share an $x$-coordinate (a symmetric property holds for horizontal segments). Denote by $S_-$ the superpixel left of $S$, $S_+$ the superpixel right of $S$ and by $S^+$ and $S^-$ the superpixels above and below $S$ (refer to Figure~\ref{fig:intersection}). 
+
+We first examine the case where the intersection between $P$ and $P'$ comes from a segment from $P$ that intersects $S$ and $S_-$ and a segment from $P'$ that intersects $S$ and $S^+$. Note that it is not possible that $R$ also intersects $S^+$ and $R'$ intersects $S_-$, or else the two convex regions $R$ and $R'$ must intersect at the vertex shared by these three superpixels. 
+If these segments intersect, the representative pixel of $R$ must lie to the right of $R'$ whilst the representative pixel of $R'$ must lie below that of $R$ and thus $R' <_x R$. Let $p'_x$ be the left-most point of $R'$ and $p_x$ be the leftmost point of $R$. Similarly, we must have that $R <_y R'$ and denote by $p_y$ the highest point on $R$ and by $p_y'$ the highest point of $R'$. Consider the (non-simple) 4-gon $G$ formed by $p_x, p_y$, a point of $R$ in $S$ and a point of $R$ in $S_-$ and 4-gon $G'$ formed by $p_x', p_y'$, a point of $R'$ in $S$ and a point of $R'$ in $S^+$. These two 4-gons must intersect and since $R$ and $R'$ are convex, they must also intersect in that point of intersection which is a contradiction with the assumption that $R$ and $R'$ are mutually disjoint convex regions.
+
+Now we examine the case where the intersection between $P$ and $P'$ cones from a segment from $P$ that intersects $S$ and $S_+$ and a segment from $P'$ that intersects $S$ and $S^-$. If these two segments intersect, we must have that $R <_x R'$ and $R' <_y R$ which is the opposite configuration from the other case. This again places the points $p_x, p_x', p_y, p_y'$ in opposite order of the points of $R$ and $R'$ in $S, S^-$ and $S_+$ and it follows that $R$ and $R'$ have to intersect.
+
+For all four cases of intersections between $P$ and $P'$, we have a symmetric argument that obtains a contradiction with the assumption that $R$ and $R'$ are disjoint which proves the lemma. 
 \end{proof}
 
-% subsection convex_upper (end)
+Per construction, the set of assigned pixels for each region is connected and since every region has at least one pixel in each superpixel it intersects, the symmetric Hausdorff distance between any region and its set of pixels is at most $2m$. Thus, we conclude the following:
 
-% section convex (end)
+\begin{theorem}
+If $\mathcal{R}$ is a set of disjoint convex regions, it is possible to find a valid assignment such that for each region $R_i \in \mathcal{R}$ with a corresponding region $P_i$, we have $H(R_i, P_i) = \Theta(m)$.
+\end{theorem}
 
-\section{Arbitrary input regions.}
-\label{sec:arbitrary}
+\jordi{this no longer shows that the resulting pixel regions are simply connected...}
 
-\subsection{Two Polygons}
+\section{Input regions are general regions.}
+\label{sec:general}
 
-Refer to the paper "The painter’s problem: covering a grid with colored connected polygons".
-Spoiler: we can pixelize two polygons at the same time using a constant stretch.
+When the input regions are arbitrary, we see a sharp contrast between one or two regions, where constant Hausdorff distance can be realized, and three or more regions, where the Hausdorff distance may be unbounded.
+The fact that one region can be represented as a grid polygon with constant Hausdorff distance was shown before by Bouts \etal~\cite{bouts2016mapping}. In Section~\ref{subsec:two} we show that the same result holds for two regions. In Section~\ref{subsec:three}
+we show that for three regions, no bounded Hausdorff distance bound exists that applies to all input.
 
-\subsection{Three of More Polygons}
+\subsection{Two Regions}
+\label{subsec:two}
+
+Our result for two arbitrary regions is based on
+a result on the Painter's Problem in \cite{goethem2017painter}.
+A Painter's Problem instance takes a grid, and for each cell, the color white, blue, red, or purple. White indicates the absence of red and blue while purple indicates the presence of both red and blue. So in
+essence, there are only two colors.
+The question is whether two disjoint simply-connected regions for red and blue exist that is consistent with all specifications of the
+cells, or, in their terminology, ``admits a painting''. Since red cells can simply be colored red and blue cells blue, the problem boils down to recoloring the purple cells with red and blue pieces. The red and blue pieces in a cell provide a panel, and all panels together make up a painting. They prove:
+
+\begin{lemma} {\bf (Lemma 8 in \cite{goethem2017painter})}
+\label{lem:painting}
+If a 2-colored grid admits a painting, then it admits a painting where each panel has at most 3 intervals of alternating red and blue along each side.
+\end{lemma}
+
+The intervals on the sides make sure that the overall red and blue parts are connected across the whole painting.
+
+They proceed to show that several configurations can be reduced to others, or simplified. For example, intervals that are not connected to other intervals on that panel can be removed (unless they were the last one of their color), and two adjacent sides with three intervals can be assumed to have the same colored interval in the corner where these sides meet.
+
+\begin{figure}[tb]
+\centering
+\includegraphics[]{painter-panels.pdf}
+\caption{Left, a superpixel showing the locations of the three intervals per side. Right, the two most complex panels represented by superpixels.}
+\label{fig:panel}
+\end{figure}
+
+In our problem, we have two regions $R_1$ and $R_2$. We create a grid coarsening $\Gamma_{11}$. We record for every superpixel whether it is visited by $R_1$ and/or $R_2$. 
+%If $R_i$ covers a superpixel completely, we assign all of its pixels to $P_i$.
+Then we forget $R_1$ and $R_2$ altogether and apply the results from \cite{goethem2017painter}. The regions $R_1$ and $R_2$ are the red and the blue region and the superpixels are the panels. Since the recording of colors with panels comes from disjoint simply-connected regions, we know that the 2-colored grid of panels admits a painting, so it admits one as specified in Lemma~\ref{lem:painting}, and we can apply the reductions to simplify the cases.
+
+It remains to show that each of the simplified cases can be represented in an $11\times 11$ superpixel with disjointness of the pieces of $P_1$ and $P_2$. This comes down to checking all cases. The two most complex ones are shown in Figure~\ref{fig:panel}; others are subsets or symmetric variants.
+
+\begin{theorem}
+If $\mathcal{R}$ consists of two disjoint, simply-connected regions, it is possible to find a valid assignment such that for each region $R_i \in \mathcal{R}$ with a corresponding region $P_i$, we have $H(R_i, P_i) = \Theta(1)$.
+\end{theorem}
+
+
+
+\subsection{Three or More Regions}
+\label{subsec:three}
 
 \begin{theorem}\label{thm:unbouded}
 % The amount of stretch needed to color a screen with three or more polygons is unbounded.
 % There are instances of three polygons that can not be ... with
-For each $\eps$ there exists an instance $\mathcal{R}=\{R_1, R_2, R_3\}$, such that there are no $\eps$-similar grid polygons.
+For each $h$ there exists an instance $\mathcal{R}=\{R_1, R_2, R_3\}$, such that there are no $h$-similar grid polygons.
 \end{theorem}
 \begin{proof}
-%Assume that the stretch needed to color a screen with three polygons is bounded by $k$.
-Assume that there is an $\eps$, such that each instance $\mathcal{R}=\{R_1, R_2, R_3\}$ allows $\eps$-similar grid polygons. Let $k=\left \lceil \eps \right \rceil$.
+Assume that there is an $h\in \mathbb{N}$, such that each instance $\mathcal{R}=\{R_1, R_2, R_3\}$ allows $h$-similar grid polygons $\mathcal{P}=\{P_1, P_2, P_3\}$.
 
 Now let $R_1$, $R_2$ and $R_3$ be three regions defined as follows:
-\jerome{spiral that loops around $k$ times, see Figure~\ref{fig:arbitrary-spirals}}
-The three regions are colored in $c_1$ (red), $c_2$ (green) and $c_3$ (blue).
-Let $\ixi$ be the region containing all points that are within distance $k$ of two different regions $R_i$.
+\jerome{spiral that loops around $h$ times, see Figure~\ref{fig:arbitrary-spirals}}
+The three regions are colored in red green and blue.
+Let $\ixi$ be the region containing all points that are within distance $h$ of at least two different regions $R_i$.
+%Let $\ell$ be the horizontal line of symmetry of $\ixi$.
 
 \begin{figure}
 \centering
 \includegraphics[scale=1]{Figures/arbitrary-lower-by-spirals.pdf}
-\caption{The regions for $k=1$. The region $\ixi$ is highlighted in yellow.}
+\caption{The regions for $h=2$. The region $\ixi$ is highlighted in yellow.}
 \label{fig:arbitrary-spirals}
 \end{figure}
 
-% Everything outside $\ixi$ can easily be drawn without much stretch.
-% Also for everything outside $\mathcal{I}$, there is not much choice for the coloring (topologically). Area $\ixi$ is the problem here.
-%Note that at the top and the bottom we have $3k+3$ "connections" each. In $\ixi$ the pixels are colored in $c_1$ (red), $c_2$ (green) and $c_3$ (blue) such that in the end, the three polygons $P_1$, $P_2$ and $P_3$ induced by the three colors are connected.
+The grid polygons intersect the upper part of the boundary if $\ixi$ in alternating order: red, green, blue, red, \dots
 
-%Let $k\Xi$ be a superpixel grid of size $f(\ell)$ \jerome{to be determined} aligned like in Figure~\draw. The input polygons $R_i$ intersect all of the superpixels in $\ixi$. \jerome{take care to make a small wiggle in the corners of the $\ixi$ so that this holds.}
-%Just outside of $\ixi$ the superpixels blibla \todo{insert coordinates} all need to contain the colors redorgreenorblue.
+For each $i\in\{1, 2, 3\}$, let $Q_i=P_i\cap \ixi$.
+$Q_i$ is a set of grid polygons.
+Also let $S_i=P_i\setminus Q_i$.
+The set $S_i$ contains $h+1$ grid polygons.
+Each separate grid polygon of $Q_i$ connects grid polygons of $S_i$.
+Let $Q$ be a grid polygon of $Q_i$. Let $t$ ($b$) be the number of grid polygons of $S_i$ that it touches at the top (bottom) boundary of $\ixi$. We then say that $Q$ has $t-1$ top connections and $b-1$ bottom connections.
+If both $t$ and $b$ are non-zero, we say that $Q$ has a middle connection.
+In order to connect the polygons in $S_i$ to form the single grid polygon $P_i$, the polygons in $Q_i$ need to make a total of $h$ connections.
+So over the three colors a total of $3h$ connections are needed.
 
-%Due to the choice of $\ixi$ we have that no pixel outside $\ixi$ and the loops is colored.
-%Due to the choice of the size of $k\Xi$ we know that each pixel in any superpixel in the area highlighted in Figure~\draw is colored in the background color.
-%We assumed that the similarity is bounded by $k$, which implies that there is a valid coloring $C$ with stretch at most $k$.
+We know that in total at most $h-1$ top connections can be made. This stems from he fact that whenever two red polygons of $S_i$ are connected
+This is proven as follows:
+let $a$ and $b$ be two red grid polygons from $S_1$ that are connected via the top of $\ixi$. Then the green and blue grid polygons of $S_2$ and $S_3$ between $a$ and $b$ can no longer be connected via the top to any green or blue grid polygons of $S_2$ and $S_3$ outside $a$ and $b$.
+\jerome{Is this above enough or do we need to elaborate more on this part of the proof?}
+The same holds for the bottom connections.
 
-Let $H=(W, F)$ be the Reeb graph of the (disconnected) regions $R=(R_1\cup R_2\cup R_3)\cap \ixi$.
-Note that $H$ is plane. Additionally $W$ contains $3\cdot k + 3$ vertices $W_t=\{r_1, g_1, b_1, r_2,\dots, r_{k+1}, g_{k+1}, b_{k+1}\}$ that correspond to the intersections of the regions $R_1$, $R_2$ and $R_3$ and the top of $\ixi$. The names of the vertices indicate the color of the polygon. The vertices are sorted from left to right.
-Similarly $W$ contains $3\cdot k + 3$ vertices $W_b=\textbf{}\{r'_0, g'_0, b'_0, r'_1,\dots, r'_k, g'_k, b'_k\}$ that correspond to the intersections of the regions $R_1$, $R_2$ and $R_3$ and the bottom of $\ixi$.
-Now if two vertices $r_i$ and $r_j$ are connected within $H$, then no vertex $g_e$ or $b_f$ that is between $r_i$ and $r_j$ can be connected to a vertex of $W_b$. Note that there are always at least two vertices of different color between two vertices of the same color in $W_t$.
-Similarly we have that if two vertices $r'_i$ and $r'_j$ are connected, then the vertices $g'_e$ and $b'_f$ between $r'_i$ and $r'_j$ are not connected to any vertex of $W_t$.
-And the same also holds for vertices of different color.
-
-Now let $E$ be a red connected component in $H$. Let $\{r_{i_1}, r_{i_2}, \dots, r_{i_e}, r'_{j_1}, \dots, r'_{j_f}\}$ be the members of $E$ that are in $W_t\cup W_b$, with $i_s<i_t$ and $j_s<j_t$ for $s<t$. We say that $E$ contains $e-1$ \emph{top brackets} and $f-1$ \emph{bottom brackets}. If either $e$ or $f$ is non-zero, we say that $E$ contains a \emph{top-bottom connection}. We extend this definition to blue and green connected components.
-
-We know that when we remove $\ixi$ from the regions three $R_1$, $R_2$ and $R_3$, we obtain $3k+6$ regions. Therefore within $\ixi$ at least $3k+3$ connections (brackets and top-bottom connections) need to be made.
-% This means that the connections within $\ixi$ must
-Now let $x$ (resp.\ $y$) be the number of top (resp.\ bottom) brackets over all connected components in $H$. Additionally let $z$ be the number of top-bottom connections over all connected components in $H$.
-We already established that for each bracket there are at least two vertices of different color that can not be within a connected component with a top-bottom connection.
-\jerome{Should we somehow mention that this also extend to nested brackets or is that already implied? I have the complete proof that $z\leq 3 k +3 -3x$ written on paper.}
-In addition to that we know that a bracket connects two vertices, which means that not both of them can have a top-bottom connection at the same time.
-If there are no brackets we know that $z\leq 3 k +3$.
-Overall this means that we have less than $3k+3 - 3x$ and less than $3k+3 - 3y$ top-bottom connections.
-% , i.e., $z\leq 3\min(k+1 - x, k+1-y)= 3(k+1 - \max(x,y))$.
-% However we have that each bracket and each top-bottom connection connects two connected components. So we need $x+y+z\geq (3k+6)-3=3k +3$ connections.
-Without loss of generality we can assume $x\geq y$.
-It follows:
-\begin{align*}
-    3k+3\leq& x+y+z\\
-    \leq& 2x + 3k+3 - 3x \\
-    \iff& \\
-    x&\leq 0
-\end{align*}
-
-As we have $0\leq y\leq x$, this means that the number of brackets is zero. This implies we have $3k+3$ top-bottom connections.
-
-However all the connections must be within distance $k$ of the middle pixel. \todo{define middle pixel}. It is impossible to rout $3k+3$ connections using only $2k+1$ pixels. \jerome{rephrase previous sentence}
-Contradiction
+This means that at least $3h- 2(h-1) = h+2$ middle connections exist. However the region $\ixi$ has only width $2h+1$ in the middle, so at most $h$ middle connections can be drawn.
+Contradiction.
 
 \end{proof}
 
@@ -496,154 +315,8 @@ Open Questions that can be still researched:
 \newpage
 \appendix
 
+\bibliographystyle{abbrv}
 
-
-\section{Write-up from Ivor for: Holes are Points}
-
-
-
-Assume that all the holes are points. In that case we can create a pixel projection $B$ with a $\Theta(\sqrt[]{md})$ symmetrical Hausdorff distance to $A$. This projection is also used in the next section where regions are convex $\beta$-fat regions.  The lower bound for this variant is obtained in the following way: let there be $m$ holes in one pixel of diameter $d$. Then because the holes need to be disjoint, we need to expand all of $A$ by at least a factor $2\sqrt[]{m}d$ in both directions to allow each hole to have a single disjoint pixel.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{Figures/pointprojection.pdf}
-\caption{The four steps of the point projection $f$. Left we see $m=4$ points in two pixels with diameter $d$. The second frame shows all the non-translated regions $D_h$ with diameter $2\sqrt[]{m}d$. The third frame shows their translation, observe that holes in the same pixel always get assigned the same region $D_h$. The fourth frame shows an arbitrary assignment of holes to pixels in their regions.}
-\label{fig:pointprojection}
-\end{figure}
-
-
-Given our object $A$ we can create a valid projection with a symmetrical Hausdorff distance to $B$ as follows: we assign to each hole $h \in H$ an axis-parallel square $D_h$ with diameter $2\sqrt[]{m}d$. We then align all the regions $D_h$ in the same way, in Figure \ref{fig:pointprojection} we align them to assign them to the left-bottom corner of each $D_h$ with the left-bottom corner of the pixel that contains the left-bottom corner of $D_h$. Lastly we iteratively assign each hole to a pixel in $D_h$ which is disjoint from any assigned pixel. There must always be such a pixel, because there are $4m$ pixels in each $D_h$ and there are only $m$ holes. This process gives a projection $f$ on $H$ with a symmetrical Hausdorff distance of at most $2\sqrt[]{m}d$ and Lemma \ref{lemma:expand} proves the rest.
-
-
-
-\section{Write-up from Ivor for: Holes are Convex and Fat}
-
-
-
-Recall that a region $B$ is $\beta$-fat if there exists an inscribed circle $I(B)$ and a enclosing circle $E(B)$ such that $\frac{|E(B)|}{|I(B)E} = \mathcal{O}(\beta)$.
-
-Let the holes all be convex $\beta$-fat regions of arbitrary size. The projection for this case has a lower bound of $\Omega(\sqrt[]{m}d$ because the proof from the previous section can immediately be applied. The projection that realizes this lower bound borrows concepts from our previous projection. There we assigned to each region a ``super pixel'' $d_h$ with diameter $2\sqrt[]{m}d$. Instead of giving each hole a super pixel and aligning those with the grid, we first create aligned super pixels and assign our holes to those. We define $G$ be an arbitrary grid of super pixels $D$ with diameter $2\sqrt[]{m}d$ aligned with the pixel grid.
-
-\begin{observation}
-\label{obs:covering}
-Observe that if any hole $h \in H$ which is $\beta$-fat and convex has a diameter greater than $\mathcal{O}(\sqrt[]{h})$ then $h$ has to cover at least one super pixel in $G$.
-\end{observation}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{Figures/fatprojection.pdf}
-\caption{The four three steps of the $\beta$-fat projection $f$. Left we see $m=6$ $\beta$-fat holes in red and 16 super pixels with black borders. The middle figure is the projection $C$ where one region is collapsed to a super pixel and the remaining regions are collapsed to a point. The last figure shows the final projection $B$ where each remaining point is assigned a pixel which has a diameter which is $2\sqrt[]{6}$ times smaller than the super pixel. }
-\label{fig:fatprojection}
-\end{figure}
-
-
-With this observation, we can make the following projection: if a hole $h$ covers at least one super pixel, we let $h$ cover all the super pixels that it covers. The remainder of their area we throw away and all the other regions get collapsed to their center point. Because of Observation \ref{obs:covering} this in-between-projection $C$ has a $\mathcal{O}(\sqrt[]{h}d)$ Hausdorff distance to $H$.
-Just like in the previous section, we then assign each point to an arbitrary disjoint pixel in its super-pixel to create our valid projection $B$. The symmetric Hausdorff distance between $H$ and $C$ is $\mathcal{O}(\sqrt[]{h}d)$ and the distance $C$ and $B$ is $\mathcal{O}(\sqrt[]{h}d)$ so the symmetric Hausdorff distance between $H$ and $B$ must be $\mathcal{O}(\sqrt[]{h}d)$. See Figure \ref{fig:fatprojection} for an example.
-
-
-
-\section{Write-up from Ivor for: Holes are Convex}
-
-
-
-Let the holes have as their only requirement that they are convex. In that case we can immediately show that the projection has a lower-bound Hausdorff distance of $\Theta(md)$. The construction is shown in Figure \ref{fig:linesexample}. We would like to create a projection of any set of convex holes $H$ that implements this lower bound such that all the projected regions are orthoconvex.
-
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{Figures/linesexample.pdf}
-\caption{The dotted square is a pixel with diameter $d$. We can let $m$ vertical lines intersect the pixel. If their length is far greater than $md$, we can only project these regions to $dm$ disjoint lines of pixels, which means that the outer lines must have a Hausdorff distance of $\Theta(md)$.}
-\label{fig:linesexample}
-\end{figure}
-
-
-\begin{observation}
-Let $R_1,R_2 \in H$ be two convex regions. If there exists a horizontal line segment $l_1$ which intersects $R_1$ and $R_2$ such that on $l_1$, $R_1$ is left from $R_2$ then there cannot be another horizontal line segment $l_2$ which intersects $R_1$ and $R_2$ such that on $l_2$, $R_1$ lies to the right of $R_2$. A symmetrical property holds for vertical line segments if we look at which segment is higher.
-\end{observation}
-
-To explain our orthoconvex projection, we first introduce some notation: the observation allows us to create a partial order $P_x$ and $P_y$ based on intersections with horizontal and vertical line segments respectively. Let $G$ be a grid of super pixels with diameter $2md+1$ that covers $H$, we denote a superpixel as $D \in G$. We define $X_H$ and $Y_H$ to be two indexes on $H$ that respect the partial orders $P_x$ and $P_y$ respectively. For any $D \in G$ we denote $D[x,y]$ to be the pixel in $D$ that is the $2x+1$'th from the left and the $2y+1'th$ pixel from the top. The algorithm involves assigning super pixels and pixels in $G$ to holes $h$ and in the end connecting those holes.
-
-\begin{enumerate}
-%\item If a hole $h$ covers at least one super pixel $D \in G$, we assign all $D$ which are coved by $h$ entirely to $h$.
-%\item If a hole $h$ covers no super pixel, then for each super pixel $D$ which is intersected by $h$ we assign $D[X_H(h), Y_H(h)]$ to $h$.
-\item For each super pixel $D$ which is intersected by a hole $h$ we assign $D[X_H(h), Y_H(h)]$ to $h$.
-\item For all holes $h$, we connect all assigned pixels with a horizontal and vertical line.
-\item If a set of lines encloses a region, we fill that region.
-\end{enumerate}
-
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{Figures/convexprojection.pdf}
-\caption{Four regions that intersect three times four super pixels and the four steps of our algorithm. four.}
-\label{fig:convexprojection}
-\end{figure}
-
-The result is clearly orthoconvex, since all assigned pixels are connected with horizontal and vertical lines and all enclosed regions are filled in. The result must also be disjoint: Any region that originally intersected a region which was filled in step 4 must originally have been to the left/right top/bottom of the region that filled a hole and thus is projected left/right above/below the filled region.
-
-
-
-\section{Write-up from Ivor for: Old Algorithm on How to Draw Arbitrary Polygons}
-
-
-
-We obtain the upper bound via a construction where we iteratively insert the $h$ holes into a grid in an arbitrary order.
-Fix an index on the holes: $H := \{ R_1, R_2 ... h_h \}$ and fix a 2-dimensional grid $G$ with cell diameter $ d 2^{h+1}$ over $A$.
-For each grid cell $\hfill\pix$ we check which holes in $A$ intersect $\hfill\pix$ and we mark $\hfill\pix$ with these holes.
-
-\begin{observation}
-If in our projection each hole $R_i$ is a connected tree which spans all grid cells marked by $R_i$ then the symmetrical Hausdorff distance is $\Theta(d2^h)$.
-\end{observation}
-
-\begin{definition}[The iteration invariant]
-In our proposed algorithm. After inserting hole $R_i$, every hole $h_j$ with $j \le i$ is a spanning tree. Where the tree has as least one vertex in each cell marked by $h_j$ and edges between vertices are orthogonal.
-\end{definition}
-
-
-Our algorithm works as follows: We start by inserting $R_1$ as an orthogonal MST of the center points of all its marked cells. This is clearly possible and it maintains the iteration invariant.
-
-
-
-For all remained holes $R_i$ we do the following:
-
-\paragraph*{Step 1}
-We start by adding a (orthogonal) closed face around each hole $h_j$ with $j < i$ in the following way:
-For each hole $h_j$ with $j < i$, for each edge $(a,b)$ we add four vertexes: $x_a, y_a, x_b, y_b$.  $x_a, x_b$ and $y_a,y_b$ are always connected with an orthogonal edge. If $a$ is a leaf, then $x_a,y_a$ are connected with an orthogonal edge and the same holds for $x_b,a_b$. Else per construction these edges are connected to another vertex. This creates an orthogonal face around each hole $h_j$.
-Lastly we glue the holes together in the following way: For every pair of edges of $R_i$, if they are parallel, their endpoints pairwise end in the same grid and there is no edge in between, we identify then with one another.
-
-Each cell $\hfill\pix$ which is marked by $R_i$ and does not contain a vertex of $R_i$, we add a vertex of $R_i$ and we name these vertexes \emph{champions}. In the original drawing $\hfill\pix$ was intersected by $R_i$ and connected. This in particular means that at least one edge of $\hfill\pix$ was intersected by $R_1$. For these edges we add an orthogonal edge from the champion to the cell that shares the edge with $\hfill\pix$. The result is that $R_i$ is connected and that there is a vertex in each cell marked by $R_i$.
-note that after step 1. The iteration invariant holds for all holes $h_j$ with $j < i$ but not for $R_i$. See Figure \ref{fig:cycle} for an example.
-
-\begin{figure}[H]
-\centering
-\includegraphics[page = 1]{Figures/cycle.pdf}
-\caption{Left we see the result after inserting $R_1$ and $R_2$ in red and blue respectively. In the middle we see the two orthogonal cycles around $R_1$ and $R_2$. Note that the green edges can be identified to one another. The edge connected straight to the right is no candidate for gluing because the endpoints do not end in the same grid cells, so we get an extra }
-\label{fig:cycle}
-\end{figure}
-
-\paragraph*{Step 2.}
-
-In step 2. We delete all endpoints of $R_i$ which are in a cell that is not marked by $R_i$. We also delete all edges with less than 2 endpoints. All remaining vertices $x$ which used to have an outgoing edge and have lost it are marked \emph{broken.}
-
-$R_i$ is now a collection of curves with three types of edges:
-
-\begin{itemize}
-\item Edges where all endpoints are regular (these are in the interior of a path). We call these \emph{regular edges}
-\item Edges which end in a champion. We call these \emph{champion edges}
-\item The case where at least one or two broken endpoints are involved but no champions. We call these \emph{broken edges}
-\end{itemize}
-
-
-\begin{observation}
-after the gluing, each of $R_i$ is in at most 2 cycles.
-\end{observation}
-\paragraph*{Step 3.}
-
-\begin{figure}[H]
-\centering
-\includegraphics[page = 2]{Figures/cycle.pdf}
-\caption{ }
-\label{fig:cycle2}
-\end{figure}
+\bibliography{bib}
 
 \end{document}
