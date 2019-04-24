@@ -1,5 +1,6 @@
-\documentclass[a4paper,UKenglish,cleveref]{lipics-v2019}
+\documentclass[a4paper, 11pt]{article}
 
+\usepackage[UKenglish]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -14,14 +15,15 @@
 \usepackage{wrapfig}
 \usepackage{float}
 \usepackage{booktabs}
-%\usepackage[margin=0.7in,footskip=0.25in]{geometry}
+\usepackage[capitalise,noabbrev]{cleveref}
+\usepackage[margin=2.5cm]{geometry}
 
-%\newtheorem{definition}{Definition}
+\newtheorem{definition}{Definition}
 \newtheorem{condition}{Condition}
 \newtheorem{conjecture}{Conjecture}
 \newtheorem{observation}{Observation}
-%\newtheorem{lemma}{Lemma}
-%\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
 
 \newcommand{\mremark}[3]{\textcolor{blue}{\textsc{#1 #2:}} \textcolor{SeaGreen}{\textsf{#3}}}
 
@@ -52,6 +54,8 @@
 \begin{document}
 \maketitle
 
+\jerome{todo change hausdorff error to h distance}
+
 \section{Introduction}
 
 \emph{Digital geometry} is concerned with the proper representation of geometric objects and their relationships using a grid of pixels. This greatly
@@ -65,7 +69,7 @@ the logarithmic error bound in this case as well.
 A possible extension to curved rays was developed by Chun \etal~\cite{chun2019consistent}.
 Other results with a digital geometry flavor within the algorithms community are those on snap rounding~\cite{de2007intersection,guibas,hershberger}, integer hulls~\cite{Althaus04,Harvey99}, and discrete schematization~\cite{loffler2017discretized}.
 
-%The main motivation for using digital geometry is the fact representations are very simple and operations are simple, robust, and easily parallelizable. 
+%The main motivation for using digital geometry is the fact representations are very simple and operations are simple, robust, and easily parallelizable.
 %it has also a large number of theoretical applications within computational geometry such as in snap rounding~\cite{de2007intersection}, integer precision geometry~\cite{harvey1999computing} and discrete schematization~\cite{loffler2017discretized}.
 
 \begin{figure}[htb]
@@ -101,20 +105,19 @@ three general regions &  \multicolumn{2}{c}{unbounded}\\
 \end{table}
 
 \subparagraph{Notation and definitions.}
-We denote by $\Gamma$ the (infinite) unit grid, whose unit squares are referred to as \emph{pixels}. 
-%By $G_k \subset \Gamma$ we denote a \emph{subgrid of size} $k$, that is, an axis-aligned square that contains exactly $k \times k$ pixels of $\Gamma$. 
-The {\em (symmetrical) Hausdorff distance} between two sets $A, B \subset \R^2$ is defined as $H(A, B) = \max \{\max_{a \in A}(\min_{b \in B}(|ab|)), \max_{b \in B}(\min_{a \in A}(|ab|))\}$. 
+We denote by $\Gamma$ the (infinite) unit grid, whose unit squares are referred to as \emph{pixels}.
+%By $G_k \subset \Gamma$ we denote a \emph{subgrid of size} $k$, that is, an axis-aligned square that contains exactly $k \times k$ pixels of $\Gamma$.
+The {\em (symmetrical) Hausdorff distance} between two sets $A, B \subset \R^2$ is defined as $H(A, B) = \max \{\max_{a \in A}(\min_{b \in B}(|ab|)), \max_{b \in B}(\min_{a \in A}(|ab|))\}$.
 %Observe that the Hausdorff distance between any two closed sets is equal to the Hausdorff distance between their boundaries.\jordi{This is not true, the previous paper only proved this for the polygons that were being pixelised}
-  
+
 Consider a set of $m$ disjoint simply-connected regions $\mathcal{R} = \{R_1, R_2, \ldots R_m \}$ in the plane.
-%that are contained in $G_k$ for some value of $k$. 
+%that are contained in $G_k$ for some value of $k$.
 In this paper, we wish to assign to each region $R_i \in \mathcal{R}$ a simply-connected subset of the pixels $P_i \subset \Gamma$, such that the result is a set of $m$ disjoint simply-connected regions.
-Two such \emph{grid polygons} are disjoint if they do not meet in any edge or vertex of the grid. A pixel polygon is connected if its pixels are connected by edge adjacency. A grid polygon is simply-connected if it is connected and its complement is also connected by edge adjacency. 
+Two such \emph{grid polygons} are disjoint if they do not meet in any edge or vertex of the grid. A pixel polygon is connected if its pixels are connected by edge adjacency. A grid polygon is simply-connected if it is connected and its complement is also connected by edge adjacency.
 Hence, we do not allow vertex adjacency at all as it is ambiguous. In this paper a grid polygon is by default simply-connected.
 We call the set $P_1, P_2, \ldots, P_m$ of such grid polygons a \emph{valid assignment}. An example is given in Figure~\ref{fig:intro}.
 
-We are interested in finding for any set of regions $\mathcal{R}$ a valid assignment where for each region $R_i \in \mathcal{R}$, its corresponding grid polygon $P_i$ has a (symmetrical) Hausdorff distance to $R_i$ of at most $h$.
-\jerome{and also the boundary?!}
+We are interested in finding for any set of regions $\mathcal{R}$ a valid assignment where for each region $R_i \in \mathcal{R}$, its corresponding grid polygon $P_i$ has a (symmetrical) Hausdorff distance to $R_i$ of at most $h$ and their boundaries are also within (symmetrical) Hausdorff distance $h$.
 In general, $h$ will be a function of $m$. We study this problem under several restrictions on $\mathcal{R}$: (1) the set $\mathcal{R}$ is a set of points, (2) the set $\mathcal{R}$ is a set of \emph{fat} convex regions, (3) the set $\mathcal{R}$ is a set of convex regions and (4) the set $\mathcal{R}$ is a set of arbitrary simply-connected regions.
 For each class of restrictions, we derive a different bound on $h$. First we show that there is a set of regions in that class for which any valid assignment contains at least one region $R_i$ with a pixel polygon $P_i$ where $H(R_i, P_i) = \Omega(h)$. Second we show that for any set of regions in that class, we can find a valid assignment such that for all regions $R_i \in \mathcal{R}$ with corresponding grid polygon $P_i$, we have $H(R_i, P_i) = O(h)$. Hence, our bounds are asymptotically tight.
 
@@ -137,13 +140,13 @@ in Section~\ref{sec:general}. In that section we also show that the bound does n
 
 \section{Input regions are points.}
 \label{sec:points}
-In this section, we assume that $\mathcal{R}$ is a set of points. We will construct a map that assigns points to pixels such that the symmetric Hausdorff distance between each point and its corresponding pixel is bounded. 
-%Surprisingly, we can show that even if the set $\mathcal{R}$ consists of points (which are the simplest form of regions) then it is still not always possible to find a valid assignment whose symmetric Hausdorff distance to $\mathcal{R}$ is bound by a constant: 
-For a lower bound, consider a set of $m$ points $\mathcal{R}$ that all lie within a single pixel. 
+In this section, we assume that $\mathcal{R}$ is a set of points. We will construct a map that assigns points to pixels such that the symmetric Hausdorff distance between each point and its corresponding pixel is bounded.
+%Surprisingly, we can show that even if the set $\mathcal{R}$ consists of points (which are the simplest form of regions) then it is still not always possible to find a valid assignment whose symmetric Hausdorff distance to $\mathcal{R}$ is bound by a constant:
+For a lower bound, consider a set of $m$ points $\mathcal{R}$ that all lie within a single pixel.
 If we want to assign each point to a unique pixel, we clearly need to use $m$ different pixels. Any set of $m$ pixels has diameter $\Omega(\sqrt{m})$, so at least
 one of the point regions will be mapped to a pixel at distance $\Omega(\sqrt{m})$. Requiring disjointness of the pixels increases the lower bound, but only by a constant factor.
 
-We now present a scheme that maps any set of $m$ points $\mathcal{R}$ to a set of pixels, such that the symmetric Hausdorff distance between any point and its pixel is at most $\mathcal{O}(\sqrt{m})$. Let $\Gamma_k$ be a coarsening of $\Gamma$ with $k=2\lceil \sqrt{k}\rceil$. Associate each region in 
+We now present a scheme that maps any set of $m$ points $\mathcal{R}$ to a set of pixels, such that the symmetric Hausdorff distance between any point and its pixel is at most $\mathcal{O}(\sqrt{m})$. Let $\Gamma_k$ be a coarsening of $\Gamma$ with $k=2\lceil \sqrt{m}\rceil$. Associate each region in
 $\mathcal{R}$ with the superpixel that contains it. Each superpixel has the space to accommodate $m$ disjoint pixels without using the bottom row and right column by using exactly the odd numbered rows and columns. We make any assignment of the points to these pixels in the same superpixel. The result is easily seen to have Hausdorff distance $O(\sqrt{m})$.
 
 %The subgrid $G_k$ contains at most $(\lfloor \frac{k}{2\sqrt{m}} \rfloor)^2$ superpixels of size $2\sqrt{m}$. We overlay $G_k$ with a slightly larger grid $G'$ that contains $(\lceil \frac{k}{2\sqrt{m}} \rceil)^2$ superpixels of size $2\sqrt{m}$ each. For every point $R_i$ we identify which superpixel $S \subset G'$ contains $R_i$. Consider the lexicographical order of the pixels in $S$. We assign $R_i$ to the $2i$'th pixel in this lexicographical order. Since the indexing on $\mathcal{R}$ is fixed, each point gets assigned to a unique pixel. Moreover, each point gets assigned to a superpixel of size $2\sqrt{m}$ that contains the point. It follows that we have found an assignment of mutually disjoint pixels that each have a distance of at most $2\sqrt{m}$ to their corresponding point. Thus we conclude:
@@ -152,7 +155,7 @@ $\mathcal{R}$ with the superpixel that contains it. Each superpixel has the spac
 If $\mathcal{R}$ is a set of points, it is possible to find a valid assignment such that for each region $R_i \in \mathcal{R}$ with a corresponding region $P_i$, we have $H(R_i, P_i) = \Theta(\sqrt{m})$.
 \end{theorem}
 
-\section{Input regions are convex $\beta$-fat regions.}
+\section{Input regions are convex $\beta$-fat regions.}Can
 \label{sec:fat}
 
 A $\beta$-fat region $R$ is a connected region with an assigned center point $p \in R$, such that the incircle of $R$ with center $p$ and the excircle of $R$ with center $p$ have a radius which differs by at most a factor $\beta$. Observe that the only regions which are $1$-fat are disks and points. In this section we consider the class $\mathcal{R}$ of convex $\beta$-fat regions for constant $\beta$. Points are $\beta$-fat regions for \emph{any} $\beta$, so from Section~\ref{sec:points} it follows that for any $m$, there exists a set of $m$ regions for which the symmetric Hausdorff distance between $\mathcal{R}$ and any valid assignment is $\Omega(\sqrt{m})$.
@@ -175,20 +178,20 @@ Let the regions have as their only requirement that they are convex. In that cas
 \label{fig:linesexample}
 \end{figure}
 
-We will describe an algorithm that, given a set of convex regions \(\mathcal{R}\), gives a set of orthoconvex grid polygons \(\mathcal{P}\) such that \(\mathcal{R}\) and \(\mathcal{P}\) are \(\Theta(m)\)-similar.
+We will describe an algorithm that, given a set of convex regions \(\mathcal{R}\), gives a set of orthoconvex grid polygons \(\mathcal{P}\) such that, for all \(i\), \(H(R_i, P_i) = O(m)\).
 
 \begin{observation}\label{obs:convex-ordering}
 Let \(R_1,R_2 \in \mathcal{R}\) be two convex regions. A horizontal line that intersects both regions will have them appear in a certain left-to-right order. There cannot be another horizontal line where this order is reversed. A symmetrical property holds for vertical lines, where there is a top-to-bottom order.
 \end{observation}
 
-\cref{obs:convex-ordering} allows us to define two partial orders \(\preceq_x\) and \(\preceq_y\) on \(\mathcal{R}\): \(R_i \preceq_x R_j\) iff the leftmost point in \(R_i\) does not lie to the right of the leftmost point in \(R_j\), and \(R_i \preceq_y R_j\) iff the topmost point in \(R_i\) does not lie below the topmost point in \(R_j\). Now let \(X_\mathcal{R}\) and \(Y_\mathcal{R}\) be two indices on \(R\) that respect \(\preceq_x\) and \(\preceq_y\), respectively, and let \(k\Gamma\) be a superpixel grid with \(k = 2m\). Finally, for any superpixel \(\spix \in k\Gamma\), we denote by \(\spix[x, y]\) the pixel that is the \(2x\)th from the left and \(2y\)th from the top within \(\spix\).
+\cref{obs:convex-ordering} allows us to define two partial orders \(\preceq_x\) and \(\preceq_y\) on \(\mathcal{R}\): \(R_i \preceq_x R_j\) iff the leftmost point in \(R_i\) does not lie to the right of the leftmost point in \(R_j\), and \(R_i \preceq_y R_j\) iff the topmost point in \(R_i\) does not lie below the topmost point in \(R_j\). Now let \(X_\mathcal{R}\) and \(Y_\mathcal{R}\) be two indices on \(R\) that respect \(\preceq_x\) and \(\preceq_y\), respectively, and let \(\Gamma_k\) be a coarsening of \(\Gamma\) with \(k = 2m\). Finally, for any superpixel \(S \in \Gamma_k\), we denote by \(S[x, y]\) the pixel that is the \(2x\)th from the left and \(2y\)th from the top within \(S\).
 
 Our algorithm works as follows:
 
 \begin{enumerate}
-	\item For each superpixel \(\spix\) that is intersected by a region \(R_i\), we color \(\spix[X_\mathcal{R}(R_i), Y_\mathcal{R}(R_i)]\) with \(c_i\).
+	\item For each superpixel \(S\) that is intersected by a region \(R_i\), we color \(S[X_\mathcal{R}(R_i), Y_\mathcal{R}(R_i)]\) with \(c_i\).
 	\item For any two pixels that are colored with \(c_i\) in adjacent superpixels, we color all pixels on the straight line segment between them with \(c_i\) as well.
-	\item For any four superpixels that form a cycle in \(G\), if they each contain a pixel colored with \(c_i\) in Step 1, we color all pixels in the square between these pixels with \(c_i\) as well.
+	\item For any four superpixels that share a common vertex, if they each contain a pixel colored with \(c_i\) in Step 1, we color all pixels in the square between these pixels with \(c_i\) as well.
 \end{enumerate}
 
 \noindent
@@ -212,8 +215,8 @@ Let \(f\) be the coloring obtained by the algorithm above.
 
 \begin{figure}[tb]
 \centering
-\includegraphics{intersection.pdf}
-\caption{An assignment of pixels such that two assigned polygons (the blue and the orange) intersect whenever you connect the pixels. }
+\includegraphics{Figures/intersection.pdf}
+\caption{An assignment of pixels such that two assigned polygons (the purple and the orange) intersect.}
 \label{fig:intersection}
 \end{figure}
 
@@ -223,7 +226,7 @@ Let \(f\) be the coloring obtained by the algorithm above.
 \begin{proof}
 	The coloring obtained in Step 1 is separated by construction; it remains to be shown that the pixels colored in Steps 2 and 3 are also separated.
 
-	In Step 2, we only color horizontal and vertical sequences of pixels, and as each color has a unique row and column in each superpixel, it suffices to show that a horizontal sequence of color \(c_i\) never intersects a vertical sequence of color \(c_j\). Assume that two such sequences do intersect; there must be one superpixel \(S\) in which both colors are present. From \(S\), the horizontal sequence extends to the superpixel to the left or right, and the vertical sequence extends to the superpixel above or below. Assume w.l.o.g. one color appears in pixel \(S[x,y]\) and extends to the right, and that another color appears in pixel \(S[u,v]\) and extends downward (the other cases are symmetrical).
+	In Step 2, we only color horizontal and vertical sequences of pixels, and as each color has a unique row and column in each superpixel, it suffices to show that a horizontal sequence of color \(c_i\) never intersects a vertical sequence of color \(c_j\). Assume that two such sequences do intersect; there must be one superpixel \(S\) in which both colors are present. From \(S\), the horizontal sequence extends to the superpixel to the left or right, and the vertical sequence extends to the superpixel above or below. Assume w.l.o.g. one color appears in pixel \(S[x,y]\) and extends to the right, and that another color appears in pixel \(S[u,v]\) and extends downward (the other cases are symmetrical). See \cref{fig:intersection} for an illustration.
 
 	As the sequences intersect, we have that \(x \leq u\) and \(v \leq y\). This implies that \(R_i \preceq_x R_j\) and \(R_j \preceq_y R_i\); note that either of these orders needs to be strict, otherwise \(R_i\) and \(R_j\) intersect. This means that either \(R_i\) contains a point strictly to the left of the leftmost point of \(R_j\), and \(R_j\) crosses from above \(R_i\) to below, or \(R_j\) contains a point strictly above the topmost point of \(R_i\), and \(R_i\) crosses from the left of \(R_j\) to the right. Both cases imply that \(R_i\) and \(R_j\) intersect, which contradicts our assumptions on the input. We conclude that no horizontal and vertical sequence can intersect, and that therefore Step 2 maintains the separation of colors.
 
@@ -233,11 +236,8 @@ Let \(f\) be the coloring obtained by the algorithm above.
 \end{proof}
 
 \begin{theorem}
-	The polygons \(\mathcal{P}\) induced by \(f\) are \(\Theta(m)\)-similar to \(\mathcal{R}\).
+	If \(\mathcal{R}\) consists of convex, simply connected regions, it is possible to find a valid assignment such that for each region \(R_i \in \mathcal{R}\) with a corresponding region \(P_i\), we have \(H(R_i, P_i) = \Theta(m)\).
 \end{theorem}
-\begin{proof}
-	By \cref{lem:convex-simply-connected,lem:convex-separated}, \(f\) is a valid coloring. By construction, \(P_i\) intersects any superpixel that \(R_i\) does. Furthermore, any \(R_i\) that contains a superpixel \(S\) necessarily intersects all surrounding superpixels. As such, \(S\) will be completely filled with color \(c_i\) in Step 3 of the algorithm, implying that \(P_i\) also contains \(S\). These two facts combined imply that \(f\) respects the superpixel grid, which lets us apply \cref{lem:respect_means_bound} to obtain the bound.
-\end{proof}
 
 \section{Input regions are general regions.}
 \label{sec:general}
@@ -272,7 +272,7 @@ They proceed to show that several configurations can be reduced to others, or si
 \label{fig:panel}
 \end{figure}
 
-In our problem, we have two regions $R_1$ and $R_2$. We create a grid coarsening $\Gamma_{11}$. We record for every superpixel whether it is visited by $R_1$ and/or $R_2$. 
+In our problem, we have two regions $R_1$ and $R_2$. We create a grid coarsening $\Gamma_{11}$. We record for every superpixel whether it is visited by $R_1$ and/or $R_2$.
 %If $R_i$ covers a superpixel completely, we assign all of its pixels to $P_i$.
 Then we forget $R_1$ and $R_2$ altogether and apply the results from \cite{goethem2017painter}. The regions $R_1$ and $R_2$ are the red and the blue region and the superpixels are the panels. Since the recording of colors with panels comes from disjoint simply-connected regions, we know that the 2-colored grid of panels admits a painting, so it admits one as specified in Lemma~\ref{lem:painting}, and we can apply the reductions to simplify the cases.
 
@@ -339,11 +339,23 @@ Contradiction.
 \section{Conclusion} % (fold)
 \label{sec:conclusion}
 
-In this paper we have shown what Hausdorff distance bounds can be attained when mapping disjoint simply-connected regions to the unit grid. We expressed our bounds in the number of regions and obtained different results depending on the shape and size characteristics of the regions. Our results are slightly more general than we expressed them: for example, the bound for point regions in fact holds for any set of regions that each have constant diameter.
+In this paper we have shown what Hausdorff distance bounds can be attained when mapping disjoint simply-connected regions to the unit grid. We expressed our bounds in the number of regions and obtained different results depending on the shape and size characteristics of the regions. The result in
+Section~\ref{subsec:two} generalizes a result of Bouts \etal~\cite{bouts2016mapping} and the result in Section~\ref{subsec:three} shows that a result by van Goethem \etal~\cite{goethem2017painter} cannot be generalized from
+two to three colors.
+Our results are slightly more general than we expressed them: for example, the bound for point regions in fact holds for any set of regions that each have constant diameter.
 
-We assumed that our regions all had the same shape and size characteristics. In some cases it is interesting to see what happens in combinations. In particular, suppose we have one general region and $m$ point regions, what Hausdorf bounds can be attained?
+\begin{figure}[tb]
+\centering
+\includegraphics[]{pixel-combi.pdf}
+\caption{Left, an instance with one general region (light blue) and $m$ point regions. Middle and right, two possible realizations for different Hausdorff bounds.}
+\label{fig:combi}
+\end{figure}
+
+We assumed that our regions all had the same shape and size characteristics. In some cases it is interesting to see what happens in combinations. In particular, suppose we have one general region $R_0$ and $m$ point regions, what Hausdorff bounds can be attained? It turns out that we get a trade-off: we can realize a Hausdorff distance of $O(\sqrt{m})$ for the point regions and for $R_0$, but we can also realize a Hausdorff distance of $O(1)$ for $R_0$ but then the point regions will get a Hausdorff distance of $\Theta(m)$. Figure~\ref{fig:combi} illustrates this. We may map the points to the grid first using the $O(\sqrt{m})$ bound, and then map the general region, or we can map the points to the grid in a constant width strip close to the boundary of the general polygon. Note that in the former case, we could have left a spacing of three pixels between the mappings of the point regions. Then the point regions still attain the $O(\sqrt{m})$ bound, but $R_0$ can realize $O(1)$ Hausdorff distance to $P_0$ by using the extra space to allow $P_0$ to reach every necessary place. However, the Hausdorff distance between the boundaries $\partial R_0$ and $\partial P_0$ will still be $\Theta(\sqrt{m})$.
 
 
+
+\iffalse
 Open Questions that can be still researched:
 \begin{enumerate}
 	\item fat non-convex polygons for interesting fatness definitions. Because for some of them Theorem~\ref{thm:unbouded} holds.
@@ -352,6 +364,7 @@ Open Questions that can be still researched:
 	\item Can we give an algorithm for a stretch depending on the complexity of $A$, i.e., number of vertices, rotation number, \dots?
 	\item We can also do a set of point regions and one more arbitrary region without upsetting the $O(\sqrt{m})$ bound. Is this also true for two arbitrary regions with $m$ point regions? Is it also true for convex regions and one or two arbitrary regions? And fat convex?
 \end{enumerate}
+\fi
 
 % section conclusion (end)
 
