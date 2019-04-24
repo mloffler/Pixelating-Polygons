@@ -165,41 +165,78 @@ If $\mathcal{R}$ is a set of $\beta$-fat convex regions for a constant $\beta$, 
 
 
 \section{Input regions are convex regions.}\label{sec:convex}
+Let the regions have as their only requirement that they are convex. In that case we can immediately show that the coloring has a lower-bound Hausdorff distance of $\Theta(m)$. The construction is shown in Figure \ref{fig:linesexample}.
 
-In this section, we consider the class of convex regions (which is a less-restricted class than the class in Section~\ref{sec:fat}). Since this class is less restricted than the previous discussed classes, it is not surprising that we obtain a worse lower-bound on the minimal Hausdorff distance between a set of regions and any valid assignment: consider a set $\mathbb{R}$ of $m$ vertical lines that each have a length of $m^2$ pixels, whose center points lie within a square of diameter of $\frac{1}{4}$. Suppose we want to find a valid assignment where for each region, the symmetric Hausdorff distance to its assigned pixels is at most $\mathcal{O}(m)$. Because each line $R_i$ has a length of $\mathcal{O}(m^2)$ pixels, its assigned set of pixels must also have a length of $\mathcal{O}(m^2)$ pixels (else the vertical distance between the line and an assigned pixel is $\mathcal{O}(m^2)$ which is more than the $\mathcal{O}(m)$ that we aim for). Any set $m$ of mutually disjoint, connected pixel regions with a length of $\mathcal{O}(m^2)$ pixels must have a width of at least $m$ pixels and it follows that the symmetric Hausdorff distance between $\mathcal{R}$ and any valid assignment is at least $\Omega(m)$.
+\begin{figure}
+\centering
+\includegraphics[scale=0.8]{Figures/linesexample.pdf}
+\caption{The dotted square is a pixel. We can let $m$ vertical lines intersect the pixel. If their length is far greater than $m$, we can only project these regions to $m$ disjoint lines of pixels, which means that the outer lines must have a Hausdorff distance of $\Theta(m)$.}
+\label{fig:linesexample}
+\end{figure}
 
-Let $\mathcal{R}$ be a set of $m$ convex regions in a grid $G_k$. Consider a vertical sweep line that sweeps $G_k$ from left to right. Under the assumption of general position, the regions in $R_i$ are hit by the sweep line in a unique order. We denote by $<_x$ this unique order. We define $<_y$ similarly based on a top-down sweep of $G_k$. We overlay $G_k$ with a slightly larger grid $G'$ that contains $(\lceil \frac{k}{2m} \rceil)^2$ superpixels of size $2m$ each. For each region $R \in \mathcal{R}$, let $\mathcal{S}$ be the set of superpixels intersected by $R$. Suppose $R$ is the $i$'th region in the order $<_x$ and the $j$'th region in the order $<_y$. Then for every superpixel $S \in \mathcal{S}$, we assign the unique pixel of $S$ to $R$ which is the $(2i)$'th pixel from the left border of $S$ and the $(2j)$'th pixel from the top border of $S$. We call this pixel the \emph{representative pixel} of $R$ in $S$. We connect all the pixels assigned to $R$ with arbitrary vertical and horizontal line segments between representative pixels.
-Lastly, we fill in the areas that are surrounded by these connections in order to make the grid polygon simply-connected.
+We will describe an algorithm that, given a set of convex regions \(\mathcal{R}\), gives a set of orthoconvex grid polygons \(\mathcal{P}\) such that \(\mathcal{R}\) and \(\mathcal{P}\) are \(\Theta(m)\)-similar.
+
+\begin{observation}\label{obs:convex-ordering}
+Let \(R_1,R_2 \in \mathcal{R}\) be two convex regions. A horizontal line that intersects both regions will have them appear in a certain left-to-right order. There cannot be another horizontal line where this order is reversed. A symmetrical property holds for vertical lines, where there is a top-to-bottom order.
+\end{observation}
+
+\cref{obs:convex-ordering} allows us to define two partial orders \(\preceq_x\) and \(\preceq_y\) on \(\mathcal{R}\): \(R_i \preceq_x R_j\) iff the leftmost point in \(R_i\) does not lie to the right of the leftmost point in \(R_j\), and \(R_i \preceq_y R_j\) iff the topmost point in \(R_i\) does not lie below the topmost point in \(R_j\). Now let \(X_\mathcal{R}\) and \(Y_\mathcal{R}\) be two indices on \(R\) that respect \(\preceq_x\) and \(\preceq_y\), respectively, and let \(k\Gamma\) be a superpixel grid with \(k = 2m\). Finally, for any superpixel \(\spix \in k\Gamma\), we denote by \(\spix[x, y]\) the pixel that is the \(2x\)th from the left and \(2y\)th from the top within \(\spix\).
+
+Our algorithm works as follows:
+
+\begin{enumerate}
+	\item For each superpixel \(\spix\) that is intersected by a region \(R_i\), we color \(\spix[X_\mathcal{R}(R_i), Y_\mathcal{R}(R_i)]\) with \(c_i\).
+	\item For any two pixels that are colored with \(c_i\) in adjacent superpixels, we color all pixels on the straight line segment between them with \(c_i\) as well.
+	\item For any four superpixels that form a cycle in \(G\), if they each contain a pixel colored with \(c_i\) in Step 1, we color all pixels in the square between these pixels with \(c_i\) as well.
+\end{enumerate}
+
+\noindent
+See \cref{fig:convexprojection} for an illustration.
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{Figures/convexprojection.pdf}
+\caption{The coloring algorithm for convex regions. (a) shows the input of four convex regions, overlaid onto a superpixel grid with \(k = 8\). (b) shows the pixels colored in Step 1 of the algorithm. (c) shows the final coloring obtained after Steps 2 and 3.}
+\label{fig:convexprojection}
+\end{figure}
+
+Let \(f\) be the coloring obtained by the algorithm above.
+
+\begin{lemma}\label{lem:convex-simply-connected}
+	The polygons induced by \(f\) are simply connected.
+\end{lemma}
+\begin{proof}
+	Consider a polygon \(P_i\) induced by \(f\). Its connectedness follows directly from the connectedness of the polygons in the input: \(R_i\) must intersect a connected set of superpixels, and our algorithm connects all of these together. It also cannot contain holes: the presence of a hole would imply that the set of superpixels intersected by \(R_i\) contains a hole, which is not possible due to \(R_i\) being simply connected and convex.
+\end{proof}
 
 \begin{figure}[tb]
 \centering
-\includegraphics[]{intersection.pdf}
+\includegraphics{intersection.pdf}
 \caption{An assignment of pixels such that two assigned polygons (the blue and the orange) intersect whenever you connect the pixels. }
 \label{fig:intersection}
 \end{figure}
 
-\begin{lemma}
-For any two regions $R, R' \in \mathcal{R}$, their sets of assigned pixels are mutually disjoint.
+\begin{lemma}\label{lem:convex-separated}
+	The polygons induced by \(f\) are separated by the background color.
 \end{lemma}
-
 \begin{proof}
-We denote by $P$ the set of pixels assigned to $R$ and by $P'$ the set of pixels assigned to $R'$. Suppose for the sake of contradiction that $P$ and $P'$ intersect at a point within a superpixel $S$. Observe that there are never two vertical line segments in $P$ and $P'$ that share an $x$-coordinate (a symmetric property holds for horizontal segments). Denote by $S_-$ the superpixel left of $S$, $S_+$ the superpixel right of $S$ and by $S^+$ and $S^-$ the superpixels above and below $S$ (refer to Figure~\ref{fig:intersection}). 
+	The coloring obtained in Step 1 is separated by construction; it remains to be shown that the pixels colored in Steps 2 and 3 are also separated.
 
-We first examine the case where the intersection between $P$ and $P'$ comes from a segment from $P$ that intersects $S$ and $S_-$ and a segment from $P'$ that intersects $S$ and $S^+$. Note that it is not possible that $R$ also intersects $S^+$ and $R'$ intersects $S_-$, or else the two convex regions $R$ and $R'$ must intersect at the vertex shared by these three superpixels. 
-If these segments intersect, the representative pixel of $R$ must lie to the right of $R'$ whilst the representative pixel of $R'$ must lie below that of $R$ and thus $R' <_x R$. Let $p'_x$ be the left-most point of $R'$ and $p_x$ be the leftmost point of $R$. Similarly, we must have that $R <_y R'$ and denote by $p_y$ the highest point on $R$ and by $p_y'$ the highest point of $R'$. Consider the (non-simple) 4-gon $G$ formed by $p_x, p_y$, a point of $R$ in $S$ and a point of $R$ in $S_-$ and 4-gon $G'$ formed by $p_x', p_y'$, a point of $R'$ in $S$ and a point of $R'$ in $S^+$. These two 4-gons must intersect and since $R$ and $R'$ are convex, they must also intersect in that point of intersection which is a contradiction with the assumption that $R$ and $R'$ are mutually disjoint convex regions.
+	In Step 2, we only color horizontal and vertical sequences of pixels, and as each color has a unique row and column in each superpixel, it suffices to show that a horizontal sequence of color \(c_i\) never intersects a vertical sequence of color \(c_j\). Assume that two such sequences do intersect; there must be one superpixel \(S\) in which both colors are present. From \(S\), the horizontal sequence extends to the superpixel to the left or right, and the vertical sequence extends to the superpixel above or below. Assume w.l.o.g. one color appears in pixel \(S[x,y]\) and extends to the right, and that another color appears in pixel \(S[u,v]\) and extends downward (the other cases are symmetrical).
 
-Now we examine the case where the intersection between $P$ and $P'$ cones from a segment from $P$ that intersects $S$ and $S_+$ and a segment from $P'$ that intersects $S$ and $S^-$. If these two segments intersect, we must have that $R <_x R'$ and $R' <_y R$ which is the opposite configuration from the other case. This again places the points $p_x, p_x', p_y, p_y'$ in opposite order of the points of $R$ and $R'$ in $S, S^-$ and $S_+$ and it follows that $R$ and $R'$ have to intersect.
+	As the sequences intersect, we have that \(x \leq u\) and \(v \leq y\). This implies that \(R_i \preceq_x R_j\) and \(R_j \preceq_y R_i\); note that either of these orders needs to be strict, otherwise \(R_i\) and \(R_j\) intersect. This means that either \(R_i\) contains a point strictly to the left of the leftmost point of \(R_j\), and \(R_j\) crosses from above \(R_i\) to below, or \(R_j\) contains a point strictly above the topmost point of \(R_i\), and \(R_i\) crosses from the left of \(R_j\) to the right. Both cases imply that \(R_i\) and \(R_j\) intersect, which contradicts our assumptions on the input. We conclude that no horizontal and vertical sequence can intersect, and that therefore Step 2 maintains the separation of colors.
 
-For all four cases of intersections between $P$ and $P'$, we have a symmetric argument that obtains a contradiction with the assumption that $R$ and $R'$ are disjoint which proves the lemma. 
+	For Step 3 to cause an intersection, we would need to have a pixel \(S[x,y]\) with color \(c_i\) inside a region being filled with color \(c_j\). Let \(S[u,v]\) be the pixel in \(S\) with color \(c_j\); assume w.l.o.g. that \(x > u\) and \(y > v\) (again, the other cases are symmetrical). For an intersection to occur, we must be filling a square with color \(c_j\) to the bottom right from \(S[u,v]\). By the same argument as used for Step 2, this means that \(R_j\) crosses from the top or left of \(R_i\) to the right or bottom, which is only possible if \(R_i\) and \(R_j\) intersect.
+
+	We conclude that none of the steps in the algorithm can violate the separation of the colors in \(f\), which implies that the induced polygons are separated by the background color.
 \end{proof}
 
-Per construction, the set of assigned pixels for each region is connected and since every region has at least one pixel in each superpixel it intersects, the symmetric Hausdorff distance between any region and its set of pixels is at most $2m$. Thus, we conclude the following:
-
 \begin{theorem}
-If $\mathcal{R}$ is a set of disjoint convex regions, it is possible to find a valid assignment such that for each region $R_i \in \mathcal{R}$ with a corresponding region $P_i$, we have $H(R_i, P_i) = \Theta(m)$.
+	The polygons \(\mathcal{P}\) induced by \(f\) are \(\Theta(m)\)-similar to \(\mathcal{R}\).
 \end{theorem}
-
-\jordi{this no longer shows that the resulting pixel regions are simply connected...}
+\begin{proof}
+	By \cref{lem:convex-simply-connected,lem:convex-separated}, \(f\) is a valid coloring. By construction, \(P_i\) intersects any superpixel that \(R_i\) does. Furthermore, any \(R_i\) that contains a superpixel \(S\) necessarily intersects all surrounding superpixels. As such, \(S\) will be completely filled with color \(c_i\) in Step 3 of the algorithm, implying that \(P_i\) also contains \(S\). These two facts combined imply that \(f\) respects the superpixel grid, which lets us apply \cref{lem:respect_means_bound} to obtain the bound.
+\end{proof}
 
 \section{Input regions are general regions.}
 \label{sec:general}
@@ -301,7 +338,8 @@ Contradiction.
 \section{Conclusion} % (fold)
 \label{sec:conclusion}
 
-In this paper we have shown what Hausdorff distance bounds can be attained when mapping disjoint simply-connected regions to the unit grid. We expressed our bounds in the number of regions and obtained different results depending 
+In this paper we have shown what Hausdorff distance bounds can be attained when mapping disjoint simply-connected regions to the unit grid. We expressed our bounds in the number of regions and obtained different results depending on the shape and size characteristics of the regions. Our r
+
 
 
 Open Questions that can be still researched:
